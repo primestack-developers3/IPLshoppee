@@ -83,16 +83,7 @@
             <!-- User Profile Section -->
             <div id="user-profile" class="flex items-center gap-3 pl-3 border-l border-white/10">
                 <div class="text-right hidden sm:block">
-                    <p id="user-name" class="text-[10px] font-                    <script>
-                    window.__firebase_config = {
-                      apiKey: "YOUR_API_KEY",
-                      authDomain: "YOUR_PROJECT.firebaseapp.com",
-                      projectId: "YOUR_PROJECT",
-                      storageBucket: "YOUR_PROJECT.appspot.com",
-                      messagingSenderId: "000000000000",
-                      appId: "1:000000000000:web:xxxxxxxxxxxx"
-                    };
-                    </script>black uppercase tracking-widest text-white leading-none">Loading...</p>
+                    <p id="user-name" class="text-[10px] font-black uppercase tracking-widest text-white leading-none">Loading...</p>
                     <button onclick="handleLogout()" class="text-[9px] font-bold text-slate-500 hover:text-red-500 uppercase tracking-tighter">Sign Out</button>
                 </div>
                 <div id="user-avatar" class="w-9 h-9 rounded-full bg-blue-600/20 border border-white/10 overflow-hidden flex items-center justify-center text-xs font-bold">
@@ -184,6 +175,23 @@
         // State & Data
         let cart = [];
         let activeTeamId = 'csk';
+
+        const persistCart = () => {
+            localStorage.setItem('ipl_cart', JSON.stringify(cart));
+        };
+
+        const loadCart = () => {
+            const stored = localStorage.getItem('ipl_cart');
+            if (stored) {
+                try {
+                    cart = JSON.parse(stored);
+                } catch (error) {
+                    cart = [];
+                    console.warn('Invalid cart state in localStorage, resetting cart.');
+                }
+            }
+        };
+
         const TEAMS = [{ id: 'csk', name: 'Chennai Super Kings', color: '#F9CD05', logo: '🦁' },{ id: 'rcb', name: 'Royal Challengers Bengaluru', color: '#E21C23', logo: '🐅' },{ id: 'mi', name: 'Mumbai Indians', color: '#004BA0', logo: '🌀' },{ id: 'kkr', name: 'Kolkata Knight Riders', color: '#3A225D', logo: '⚔️' },{ id: 'rr', name: 'Rajasthan Royals', color: '#EA1A85', logo: '🏰' },{ id: 'srh', name: 'Sunrisers Hyderabad', color: '#FF822E', logo: '🦅' },{ id: 'gt', name: 'Gujarat Titans', color: '#1B2133', logo: '⚡' },{ id: 'lsg', name: 'Lucknow Super Giants', color: '#0057E7', logo: '🕊️' },{ id: 'dc', name: 'Delhi Capitals', color: '#000080', logo: '🐅' },{ id: 'pbks', name: 'Punjab Kings', color: '#ED1B24', logo: '🦁' }];
         const MERCH = [{ id: 'jersey', name: 'Jersey', price: 1999, img: '👕' },{ id: 'cap', name: 'Cap', price: 799, img: '🧢' },{ id: 'hoodie', name: 'Hoodie', price: 2999, img: '🧥' }];
         const TRENDING = [{ id: 't1', teamId: 'csk', name: 'Classic Jersey', price: 1999, img: '👕', sales: '18k+' },{ id: 't2', teamId: 'rcb', name: 'Red Hoodie', price: 2999, img: '🧥', sales: '10k+' },{ id: 't3', teamId: 'mi', name: 'Official Cap', price: 799, img: '🧢', sales: '14k+' },{ id: 't4', teamId: 'gt', name: 'Training Tee', price: 1299, img: '👕', sales: '7k+' }];
@@ -264,6 +272,7 @@
         window.addToCart = (itemId, teamId) => {
             const itemBase = TRENDING.find(p => p.id === itemId) || MERCH.find(m => m.id === itemId);
             cart.push({...itemBase, cartId: Date.now()});
+            persistCart();
             updateCartCount();
             showToast();
         };
@@ -285,11 +294,15 @@
             document.getElementById('total-price').innerText = `₹${(total * 1.18).toFixed(0)}`;
         };
 
-        window.removeFromCart = (cid) => { cart = cart.filter(i => i.cartId !== cid); renderCart(); updateCartCount(); };
+        window.removeFromCart = (cid) => { cart = cart.filter(i => i.cartId !== cid); persistCart(); renderCart(); updateCartCount(); };
         const showToast = () => { const t = document.getElementById('toast'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); };
-        window.processCheckout = () => { alert('Order Placed!'); cart = []; updateCartCount(); showView('home'); };
+        window.processCheckout = () => { alert('Order Placed!'); cart = []; persistCart(); updateCartCount(); showView('home'); };
 
-        window.onload = () => renderHome();
+        window.onload = () => {
+            loadCart();
+            updateCartCount();
+            renderHome();
+        };
     </script>
 </body>
 </html>
