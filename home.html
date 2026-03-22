@@ -54,6 +54,59 @@
         .toast-notification.show {
             transform: translateY(0);
         }
+
+        .teams-dropdown {
+            position: absolute;
+            top:full;
+            left:0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease-out;
+            pointer-events: none;
+            z-index: 40;
+        }
+
+        .teams-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .teams-dropdown-content {
+            background: rgba(15, 15, 18, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+            min-width: 600px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .team-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            transition: all 0.2s ease-out;
+            border: 1px solid transparent;
+            text-transform: uppercase;
+        }
+
+        .team-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(4px);
+        }
     </style>
 </head>
 <body class="selection:bg-blue-500/30">
@@ -72,6 +125,28 @@
             <button onclick="showView('shop')" class="nav-link hover:text-white transition-colors" data-view="shop">Collections</button>
             <button onclick="showView('shipping')" class="nav-link hover:text-white transition-colors" data-view="shipping">Shipping</button>
             <button onclick="showView('contact')" class="nav-link hover:text-white transition-colors" data-view="contact">Contact</button>
+        </div>
+
+        <!-- Teams Dropdown -->
+        <div class="relative hidden lg:block">
+            <button onclick="toggleTeamsDropdown()" class="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors group">
+                🏆 Teams
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-180 transition-transform"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div id="teams-dropdown" class="teams-dropdown">
+                <div class="teams-dropdown-content">
+                    <a href="IPL teams/csk.html" class="team-link">🦁 CSK</a>
+                    <a href="IPL teams/rcb.html" class="team-link">🐅 RCB</a>
+                    <a href="IPL teams/mi.html" class="team-link">🌀 MI</a>
+                    <a href="IPL teams/kkr.html" class="team-link">⚔️ KKR</a>
+                    <a href="IPL teams/rr.html" class="team-link">🏰 RR</a>
+                    <a href="IPL teams/srh.html" class="team-link">🦅 SRH</a>
+                    <a href="IPL teams/gt.html" class="team-link">⚡ GT</a>
+                    <a href="IPL teams/lsg.html" class="team-link">🕊️ LSG</a>
+                    <a href="IPL teams/dc.html" class="team-link">🐅 DC</a>
+                    <a href="IPL teams/pbks.html" class="team-link">🦁 PBKS</a>
+                </div>
+            </div>
         </div>
 
         <div class="flex items-center gap-3">
@@ -222,6 +297,20 @@
             await signOut(auth);
             window.location.href = 'index.html';
         };
+
+        // Teams Dropdown Logic
+        window.toggleTeamsDropdown = () => {
+            const dropdown = document.getElementById('teams-dropdown');
+            dropdown.classList.toggle('show');
+        };
+
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('teams-dropdown');
+            const dropdownBtn = e.target.closest('button');
+            if (!dropdownBtn?.textContent?.includes('Teams') && dropdown?.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        });
 
         // Logic (Exposed to global window for HTML onclicks)
         window.showView = (viewId) => {
