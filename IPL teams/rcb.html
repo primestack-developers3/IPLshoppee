@@ -9,7 +9,26 @@
     body { font-family: 'Space Grotesk', sans-serif; background-color: #0a0a0c; color: #f1f5f9; }
     .product-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.5rem; padding: 1.5rem; transition: all 0.3s ease-out; display: flex; flex-direction: column; height: 100%; cursor: pointer; }
     .product-card:hover { border-color: rgba(255, 255, 255, 0.3); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); transform: translateY(-8px); }
-    .product-image { width: 100%; height: 200px; background: rgba(30, 41, 59, 0.6); border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 5rem; margin-bottom: 1rem; }
+        .product-image {
+      width: 100%;
+      background: rgba(30, 41, 59, 0.35);
+      border-radius: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      padding: 0.35rem;
+      box-sizing: border-box;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      border-radius: 0.75rem;
+      display: block;
+    }
     .product-title { font-weight: 700; font-size: 0.95rem; line-height: 1.3; margin-bottom: 0.5rem; min-height: 2.6rem; }
     .product-price { font-size: 1.5rem; font-weight: 900; color: #ef4444; margin-bottom: 0.5rem; }
     .product-rating { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.85rem; color: #cbd5e1; }
@@ -25,6 +44,18 @@
     .toast-notification { position: fixed; bottom: 2rem; right: 2rem; background: #dc2626; color: white; padding: 1rem 1.5rem; border-radius: 1rem; font-weight: 800; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); transform: translateY(100px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; }
     .toast-notification.show { transform: translateY(0); }
     /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+     /* Modal Styles */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -340,27 +371,117 @@
     }
   </style>
 </head>
-<body class="selection:bg-red-500/30">
+<body class="selection:bg-blue-500/30">
+  <!-- Navigation Bar -->
   <div class="nav-bar fixed top-0 w-full z-50">
-    <a href="../home.html" class="nav-brand"><div class="team-logo">🐯</div><div><h2 class="text-lg font-black tracking-tight">IPL <span style="color: #dc2626;">PRO</span></h2></div></a>
+    <a href="../home.html" class="nav-brand">
+      <div class="team-logo">🦁</div>
+      <div>
+        <h2 class="text-lg font-black tracking-tight">IPL <span style="color: #ff0000;">PRO</span></h2>
+      </div>
+    </a>
     <div class="flex items-center gap-4">
-      <button id="cart-btn" class="text-white hover:text-red-400 transition-colors" onclick="openCartModal()">
+      <button id="cart-btn" class="text-white hover:text-yellow-400 transition-colors" onclick="openCartModal()">
         🛒 <span id="cart-count" class="bg-red-500 text-black px-2 py-1 rounded-full text-xs font-bold">0</span>
       </button>
       <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">RCB Official Store</div>
     </div>
   </div>
+
+  <!-- Main Content -->
   <main class="pt-24 px-6 pb-10">
     <div class="max-w-7xl mx-auto">
-      <div class="header-section"><h1>🐅 Royal Challengers Bengaluru</h1><p>Official RCB Merchandise - Premium Jerseys, Caps & More</p></div>
+      <!-- Header Section -->
+      <div class="header-section">
+        <h1>Royal Challengers Bangalore</h1>
+        <p>Official RCB Merchandise - Premium Jerseys, Caps & More</p>
+      </div>
+
+      <!-- Products Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        <div class="product-card" onclick="showProductModal('RCB Official Jersey 2024', '👕', '₹1,999', '★★★★★', '2,156', 'Premium quality replica jersey featuring the official RCB design for the 2024 season. Made from breathable polyester fabric with moisture-wicking technology. Includes player name and number customization options.')"><div class="product-image">👕</div><h3 class="product-title">RCB Official Jersey 2024</h3><div class="product-price">₹1,999</div><div class="product-rating"><span class="stars">★★★★★</span><span>(2,156 reviews)</span></div><button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('RCB Jersey', 1999)">Add to Cart</button></div>
-        <div class="product-card" onclick="showProductModal('RCB Premium Hoodie', '🧥', '₹2,999', '★★★★★', '1,734', 'Comfortable cotton-polyester blend hoodie with RCB logo and team colors. Features a kangaroo pocket, adjustable hood, and ribbed cuffs. Perfect for casual wear and match days.')"><div class="product-image">🧥</div><h3 class="product-title">RCB Premium Hoodie</h3><div class="product-price">₹2,999</div><div class="product-rating"><span class="stars">★★★★★</span><span>(1,734 reviews)</span></div><button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('RCB Hoodie', 2999)">Add to Cart</button></div>
-        <div class="product-card" onclick="showProductModal('RCB Official Cap', '🧢', '₹799', '★★★★☆', '1,432', 'Classic baseball cap with embroidered RCB logo. Adjustable strap for perfect fit. Made from high-quality cotton twill with curved brim for UV protection.')"><div class="product-image">🧢</div><h3 class="product-title">RCB Official Cap</h3><div class="product-price">₹799</div><div class="product-rating"><span class="stars">★★★★☆</span><span>(1,432 reviews)</span></div><button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('RCB Cap', 799)">Add to Cart</button></div>
-        <div class="product-card" onclick="showProductModal('RCB Classic T-Shirt', '👕', '₹599', '★★★★★', '2,987', 'Comfortable cotton t-shirt with RCB logo print. Available in multiple sizes. Features crew neck, short sleeves, and tagless design for all-day comfort.')"><div class="product-image">👕</div><h3 class="product-title">RCB Classic T-Shirt</h3><div class="product-price">₹599</div><div class="product-rating"><span class="stars">★★★★★</span><span>(2,987 reviews)</span></div><button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('RCB T-Shirt', 599)">Add to Cart</button></div>
-        <div class="product-card" onclick="showProductModal('RCB Sports Backpack', '🎒', '₹1,799', '★★★★★', '698', 'Official RCB branded sports backpack with multiple compartments, perfect for carrying your cricket gear and daily essentials. Made with durable polyester material and features the iconic RCB logo prominently displayed.')"><div class="product-image">🎒</div><h3 class="product-title">RCB Sports Backpack</h3><div class="product-price">₹1,799</div><div class="product-rating"><span class="stars">★★★★★</span><span>(698 reviews)</span></div><button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('RCB Backpack', 1799)">Add to Cart</button></div>
-        <div class="product-card" onclick="showProductModal('RCB Cricket Gloves', '🧤', '₹1,299', '★★★★★', '823', 'Professional-grade cricket gloves with RCB branding. Provides excellent grip and protection for batsmen. Made with premium leather and padding.')"><div class="product-image">🧤</div><h3 class="product-title">RCB Cricket Gloves</h3><div class="product-price">₹1,299</div><div class="product-rating"><span class="stars">★★★★★</span><span>(823 reviews)</span></div><button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('RCB Gloves', 1299)">Add to Cart</button></div>
-        <div class="product-card" onclick="showProductModal('RCB Phone Case', '📱', '₹799', '★★★★☆', '1,234', 'Protective phone case featuring RCB design. Compatible with most smartphone models. Made from durable TPU material with raised edges for screen protection.')"><div class="product-image">📱</div><h3 class="product-title">RCB Phone Case</h3><div class="product-price">₹799</div><div class="product-rating"><span class="stars">★★★★☆</span><span>(1,234 reviews)</span></div><button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('RCB Phone Case', 799)">Add to Cart</button></div>
+        <!-- Jersey -->
+        <div class="product-card" onclick="showProductModal('RCB Official Jersey 2024', '👕', '₹1,999', '★★★★★', '2,341', 'Premium quality replica jersey featuring the official RCB design for the 2024 season. Made from breathable polyester fabric with moisture-wicking technology. Includes player name and number customization options.')">
+          <div class="product-image"><img src="../RCB JERSEY/1.png" alt="RCB Official Jersey 2024"></div>
+          <h3 class="product-title">RCB Official Jersey 2024</h3>
+          <div class="product-price">₹1,999</div>
+          <div class="product-rating">
+            <span class="stars">★★★★★</span>
+            <span>(2,341 reviews)</span>
+          </div>
+          <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('RCB Jersey', 1999)">Add to Cart</button>
+        </div>
+
+        <!-- Hoodie -->
+        <div class="product-card" onclick="showProductModal('RCB Premium Hoodie', '🧥', '₹2,999', '★★★★★', '1,856', 'Comfortable cotton-polyester blend hoodie with RCB logo and team colors. Features a kangaroo pocket, adjustable hood, and ribbed cuffs. Perfect for casual wear and match days.')">
+          <div class="product-image"><img src="../RCB JERSEY/2.png" alt="RCB Premium Hoodie"></div>
+          <h3 class="product-title">RCB Premium Hoodie</h3>
+          <div class="product-price">₹2,999</div>
+          <div class="product-rating">
+            <span class="stars">★★★★★</span>
+            <span>(1,856 reviews)</span>
+          </div>
+          <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('CSK Hoodie', 2999)">Add to Cart</button>
+        </div>
+
+        <!-- Cap -->
+        <div class="product-card" onclick="showProductModal('RCB Official Cap', '🧢', '₹799', '★★★★☆', '1,523', 'Classic baseball cap with embroidered RCB logo. Adjustable strap for perfect fit. Made from high-quality cotton twill with curved brim for UV protection.')">
+          <div class="product-image"><img src="../RCB JERSEY/3.png" alt="RCB Official Cap"></div>
+          <h3 class="product-title">RCB Official Cap</h3>
+          <div class="product-price">₹799</div>
+          <div class="product-rating">
+            <span class="stars">★★★★☆</span>
+            <span>(1,523 reviews)</span>
+          </div>
+          <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('RCB Cap', 799)">Add to Cart</button>
+        </div>
+
+        <!-- T-Shirt -->
+        <div class="product-card" onclick="showProductModal('RCB Classic T-Shirt', '👕', '₹599', '★★★★★', '3,102', 'Comfortable cotton t-shirt with RCB logo print. Available in multiple sizes. Features crew neck, short sleeves, and tagless design for all-day comfort.')">
+          <div class="product-image"><img src="../RCB JERSEY/4.png" alt="RCB Classic T-Shirt"></div>
+          <h3 class="product-title">RCB Classic T-Shirt</h3>
+          <div class="product-price">₹599</div>
+          <div class="product-rating">
+            <span class="stars">★★★★★</span>
+            <span>(3,102 reviews)</span>
+          </div>
+          <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('RCB T-Shirt', 599)">Add to Cart</button>
+        </div>
+
+        <!-- Backpack -->
+        <div class="product-card" onclick="showProductModal('RCB Sports Backpack', '🎒', '₹1,799', '★★★★★', '745', 'Official RCB branded sports backpack with multiple compartments, perfect for carrying your cricket gear and daily essentials. Made with durable polyester material and features the iconic RCB lion logo prominently displayed.')">
+        <div class="product-image"><img src="../RCB JERSEY/6.png" alt="RCB Sports Backpack"></div>
+          <h3 class="product-title">RCB Sports Backpack</h3>
+          <div class="product-price">₹1,799</div>
+          <div class="product-rating">
+            <span class="stars">★★★★★</span>
+            <span>(745 reviews)</span>
+          </div>
+          <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('RCB Backpack', 1799)">Add to Cart</button>
+        </div>
+
+        <!-- Gloves -->
+        <div class="product-card" onclick="showProductModal('RCB Cricket Gloves', '🧤', '₹1,299', '★★★★★', '823', 'Professional-grade cricket gloves with RCB branding. Provides excellent grip and protection for batsmen. Made with premium leather and padding.')">
+        <div class="product-image"><img src="../RCB JERSEY/7.png" alt="RCB Cricket Gloves"></div>
+          <h3 class="product-title">RCB Cricket Gloves</h3>
+          <div class="product-price">₹1,299</div>
+          <div class="product-rating">
+            <span class="stars">★★★★★</span>
+            <span>(823 reviews)</span>
+          </div>
+          <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('RCB Gloves', 1299)">Add to Cart</button>
+        </div>
+
+        <!-- Phone Case -->
+        <div class="product-card" onclick="showProductModal('RCB Phone Case', '📱', '₹799', '★★★★☆', '1,234', 'Protective phone case featuring RCB design. Compatible with most smartphone models. Made from durable TPU material with raised edges for screen protection.')">
+        <div class="product-image"><img src="../RCB JERSEY/8.png" alt="RCB Phone Case"></div>
+          <h3 class="product-title">RCB Phone Case</h3>
+          <div class="product-price">₹799</div>
+          <div class="product-rating">
+            <span class="stars">★★★★☆</span>
+            <span>(1,234 reviews)</span>
+          </div>
+          <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('RCB Phone Case', 799)">Add to Cart</button>
+        </div>
       </div>
 
       <!-- Checkout Section -->
@@ -391,25 +512,25 @@
               <div class="space-y-4">
                 <div>
                   <label class="block text-sm font-medium mb-2">Card Number</label>
-                  <input type="text" placeholder="1234 5678 9012 3456" maxlength="19" pattern="[0-9\s]{13,19}" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg focus:border-red-500 focus:outline-none" required>
+                  <input type="text" placeholder="1234 5678 9012 3456" maxlength="19" pattern="[0-9\s]{13,19}" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg focus:border-blue-500 focus:outline-none" required>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                   <div>
                     <label class="block text-sm font-medium mb-2">Expiry Date</label>
-                    <input type="text" placeholder="MM/YY" maxlength="5" pattern="(0[1-9]|1[0-2])\/([0-9]{2})" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg focus:border-red-500 focus:outline-none" required>
+                    <input type="text" placeholder="MM/YY" maxlength="5" pattern="(0[1-9]|1[0-2])\/([0-9]{2})" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg focus:border-blue-500 focus:outline-none" required>
                   </div>
                   <div>
                     <label class="block text-sm font-medium mb-2">CVV</label>
-                    <input type="text" placeholder="123" maxlength="4" pattern="[0-9]{3,4}" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg focus:border-red-500 focus:outline-none" required>
+                    <input type="text" placeholder="123" maxlength="4" pattern="[0-9]{3,4}" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg focus:border-blue-500 focus:outline-none" required>
                   </div>
                 </div>
                 <div>
                   <label class="block text-sm font-medium mb-2">Cardholder Name</label>
-                  <input type="text" placeholder="John Doe" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg focus:border-red-500 focus:outline-none" required>
+                  <input type="text" placeholder="John Doe" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg focus:border-blue-500 focus:outline-none" required>
                 </div>
                 <div>
                   <label class="block text-sm font-medium mb-2">Billing Address</label>
-                  <textarea placeholder="Enter your billing address" rows="3" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg focus:border-red-500 focus:outline-none" required></textarea>
+                  <textarea placeholder="Enter your billing address" rows="3" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg focus:border-blue-500 focus:outline-none" required></textarea>
                 </div>
                 <button type="submit" class="w-full add-to-cart-btn">Pay Now</button>
               </div>
@@ -417,38 +538,23 @@
           </div>
         </div>
       </div>
-
-  <!-- Product Modal -->
-  <div id="product-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-      <div class="p-6">
-        <div class="flex justify-between items-start mb-4">
-          <h2 id="modal-title" class="text-xl font-bold text-white"></h2>
-          <button onclick="closeProductModal()" class="text-slate-400 hover:text-white text-2xl">&times;</button>
-        </div>
-        <div class="text-center mb-4">
-          <div id="modal-image" class="text-6xl mb-4"></div>
-          <div id="modal-price" class="text-2xl font-bold text-red-400 mb-2"></div>
-          <div id="modal-rating" class="text-sm text-slate-300 mb-4"></div>
-        </div>
-        <div id="modal-description" class="text-slate-300 text-sm leading-relaxed mb-6"></div>
-        <button id="modal-add-to-cart" class="w-full bg-gradient-to-r from-red-600 to-red-700 text-white font-bold py-3 px-6 rounded-xl hover:from-red-700 hover:to-red-800 transition-all">Add to Cart</button>
-      </div>
     </div>
-  </div>
+  </main>
 
   <!-- Cart Modal -->
   <div class="modal-overlay" id="cartModal">
     <div class="modal-container">
       <div class="modal-header">
-        <h2>?? Your Dugout</h2>
-        <button class="close-btn" onclick="closeCartModal()">�</button>
+        <h2>🛒 Your Dugout</h2>
+        <button class="close-btn" onclick="closeCartModal()">×</button>
       </div>
-      <div class="modal-body" id="cartItemsContainer"></div>
+      <div class="modal-body" id="cartItemsContainer">
+        <!-- Cart items will be rendered here -->
+      </div>
       <div class="cart-summary" id="cartSummary" style="display: none;">
         <div class="cart-total">
           <span>Total:</span>
-          <span id="cartTotalPrice">?0</span>
+          <span id="cartTotalPrice">₹0</span>
         </div>
         <div class="cart-actions">
           <button class="checkout-btn" onclick="proceedToCheckout()">Checkout</button>
@@ -463,16 +569,18 @@
     <div class="modal-container">
       <div class="modal-header">
         <h2 id="productModalTitle">Product Details</h2>
-        <button class="close-btn" onclick="closeProductModal()">�</button>
+        <button class="close-btn" onclick="closeProductModal()">×</button>
       </div>
       <div class="modal-body">
         <div class="product-detail-content">
-          <div class="product-detail-image" id="productModalImage">??</div>
+          <div class="product-detail-image" id="productModalImage">👕</div>
           <div class="product-detail-info">
             <h3 id="productModalTitle2">Product Name</h3>
-            <div class="product-detail-price" id="productModalPrice">?0</div>
-            <div class="product-detail-rating" id="productModalRating">????? (0 reviews)</div>
-            <div class="product-detail-description" id="productModalDescription">Product description will appear here.</div>
+            <div class="product-detail-price" id="productModalPrice">₹0</div>
+            <div class="product-detail-rating" id="productModalRating">★★★★★ (0 reviews)</div>
+            <div class="product-detail-description" id="productModalDescription">
+              Product description will appear here.
+            </div>
             <button class="product-detail-btn" onclick="addToCartFromModal()">Add to Dugout</button>
           </div>
         </div>
@@ -481,7 +589,7 @@
   </div>
 
   <div class="toast-notification" id="toast">Added to Dugout! 🏏</div>
-  <script>
+
   <script>
     // Get cart from localStorage or initialize empty
     let cart = JSON.parse(localStorage.getItem('iplCart')) || [];
@@ -732,11 +840,4 @@
     });
   </script>
 </body>
-
-  </script>
-</body>
 </html>
-
-
-
-
