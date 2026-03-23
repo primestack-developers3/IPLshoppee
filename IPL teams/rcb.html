@@ -24,13 +24,327 @@
     .header-section p { color: #cbd5e1; font-size: 1rem; }
     .toast-notification { position: fixed; bottom: 2rem; right: 2rem; background: #dc2626; color: white; padding: 1rem 1.5rem; border-radius: 1rem; font-weight: 800; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); transform: translateY(100px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; }
     .toast-notification.show { transform: translateY(0); }
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-container {
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1.5rem;
+      max-width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      width: 600px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .modal-header h2 {
+      font-size: 1.5rem;
+      font-weight: 900;
+      margin: 0;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #f1f5f9;
+      font-size: 2rem;
+      cursor: pointer;
+      padding: 0;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      transform: rotate(90deg);
+      color: #60a5fa;
+    }
+
+    .modal-body {
+      padding: 2rem;
+    }
+
+    /* Cart Modal Specific */
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      background: rgba(30, 41, 59, 0.35);
+      border-radius: 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .cart-item-info {
+      flex: 1;
+    }
+
+    .cart-item-name {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .cart-item-price {
+      color: #cbd5e1;
+      font-size: 0.9rem;
+    }
+
+    .cart-item-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(20, 30, 48, 0.8);
+      padding: 0.25rem;
+      border-radius: 0.5rem;
+    }
+
+    .qty-btn {
+      background: none;
+      border: none;
+      color: #60a5fa;
+      cursor: pointer;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+
+    .qty-btn:hover {
+      background: rgba(96, 165, 250, 0.2);
+      color: #93c5fd;
+    }
+
+    .qty-display {
+      min-width: 30px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .remove-btn {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .remove-btn:hover {
+      background: rgba(239, 68, 68, 0.3);
+      border-color: rgba(239, 68, 68, 0.5);
+    }
+
+    .cart-summary {
+      background: rgba(30, 41, 59, 0.35);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1.5rem 2rem;
+      position: sticky;
+      bottom: 0;
+    }
+
+    .cart-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.25rem;
+      font-weight: 900;
+      margin-bottom: 1rem;
+    }
+
+    .cart-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .checkout-btn {
+      flex: 1;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+    }
+
+    .checkout-btn:hover {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      transform: translateY(-2px);
+    }
+
+    .clear-cart-btn {
+      flex: 1;
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+    }
+
+    .clear-cart-btn:hover {
+      background: rgba(239, 68, 68, 0.3);
+      border-color: rgba(239, 68, 68, 0.5);
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: #cbd5e1;
+    }
+
+    .empty-cart p {
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Product Detail Modal */
+    .product-detail-modal .modal-container {
+      width: 700px;
+    }
+
+    .product-detail-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .product-detail-image {
+      font-size: 8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(30, 41, 59, 0.35);
+      border-radius: 1rem;
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      min-height: 300px;
+    }
+
+    .product-detail-info h3 {
+      font-size: 1.5rem;
+      font-weight: 900;
+      margin-bottom: 0.5rem;
+    }
+
+    .product-detail-price {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #60a5fa;
+      margin: 1rem 0;
+    }
+
+    .product-detail-rating {
+      color: #cbd5e1;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .product-detail-description {
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .product-detail-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+    }
+
+    .product-detail-btn:hover {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .modal-container {
+        width: 95%;
+      }
+
+      .product-detail-content {
+        grid-template-columns: 1fr;
+      }
+
+      .product-detail-image {
+        min-height: 200px;
+        font-size: 5rem;
+      }
+
+      .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .cart-item-controls {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 1rem;
+      }
+    }
   </style>
 </head>
 <body class="selection:bg-red-500/30">
   <div class="nav-bar fixed top-0 w-full z-50">
     <a href="../home.html" class="nav-brand"><div class="team-logo">🐯</div><div><h2 class="text-lg font-black tracking-tight">IPL <span style="color: #dc2626;">PRO</span></h2></div></a>
     <div class="flex items-center gap-4">
-      <button id="cart-btn" class="text-white hover:text-red-400 transition-colors" onclick="showCheckout()">
+      <button id="cart-btn" class="text-white hover:text-red-400 transition-colors" onclick="openCartModal()">
         🛒 <span id="cart-count" class="bg-red-500 text-black px-2 py-1 rounded-full text-xs font-bold">0</span>
       </button>
       <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">RCB Official Store</div>
@@ -123,40 +437,232 @@
     </div>
   </div>
 
+  <!-- Cart Modal -->
+  <div class="modal-overlay" id="cartModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2>?? Your Dugout</h2>
+        <button class="close-btn" onclick="closeCartModal()">�</button>
+      </div>
+      <div class="modal-body" id="cartItemsContainer"></div>
+      <div class="cart-summary" id="cartSummary" style="display: none;">
+        <div class="cart-total">
+          <span>Total:</span>
+          <span id="cartTotalPrice">?0</span>
+        </div>
+        <div class="cart-actions">
+          <button class="checkout-btn" onclick="proceedToCheckout()">Checkout</button>
+          <button class="clear-cart-btn" onclick="clearAllCart()">Clear Cart</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Detail Modal -->
+  <div class="modal-overlay product-detail-modal" id="productModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2 id="productModalTitle">Product Details</h2>
+        <button class="close-btn" onclick="closeProductModal()">�</button>
+      </div>
+      <div class="modal-body">
+        <div class="product-detail-content">
+          <div class="product-detail-image" id="productModalImage">??</div>
+          <div class="product-detail-info">
+            <h3 id="productModalTitle2">Product Name</h3>
+            <div class="product-detail-price" id="productModalPrice">?0</div>
+            <div class="product-detail-rating" id="productModalRating">????? (0 reviews)</div>
+            <div class="product-detail-description" id="productModalDescription">Product description will appear here.</div>
+            <button class="product-detail-btn" onclick="addToCartFromModal()">Add to Dugout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="toast-notification" id="toast">Added to Dugout! 🏏</div>
   <script>
-    let cart = [];
-    let total = 0;
+  <script>
+    // Get cart from localStorage or initialize empty
+    let cart = JSON.parse(localStorage.getItem('iplCart')) || [];
+    let currentProductModal = null;
 
-    const showToast = () => {
-      const t = document.getElementById('toast');
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2000);
+    // Initialize cart on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      updateCartCount();
+      renderCartItems();
+    });
+
+    const saveCartToLocalStorage = () => {
+      localStorage.setItem('iplCart', JSON.stringify(cart));
+      updateCartCount();
+    };
+
+    const updateCartCount = () => {
+      const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      const cartCount = document.getElementById('cart-count');
+      if (cartCount) {
+        cartCount.textContent = count;
+      }
     };
 
     const addToCart = (productName, price) => {
-      cart.push({ name: productName, price: price });
-      total += price;
-      updateCartCount();
+      // Check if product already exists in cart
+      const existingItem = cart.find(item => item.name === productName);
+      
+      if (existingItem) {
+        existingItem.quantity = (existingItem.quantity || 1) + 1;
+      } else {
+        cart.push({
+          name: productName,
+          price: price,
+          quantity: 1,
+          id: Date.now() // unique ID for each cart entry
+        });
+      }
+      
+      saveCartToLocalStorage();
       showToast();
       console.log(`Added to cart: ${productName} - ₹${price}`);
     };
 
-    const updateCartCount = () => {
-      document.getElementById('cart-count').textContent = cart.length;
+    const removeFromCart = (id) => {
+      cart = cart.filter(item => item.id !== id);
+      saveCartToLocalStorage();
+      renderCartItems();
     };
 
-    const showCheckout = () => {
+    const updateQuantity = (id, quantity) => {
+      if (quantity <= 0) {
+        removeFromCart(id);
+        return;
+      }
+      const item = cart.find(item => item.id === id);
+      if (item) {
+        item.quantity = quantity;
+        saveCartToLocalStorage();
+        renderCartItems();
+      }
+    };
+
+    const clearAllCart = () => {
+      if (confirm('Are you sure you want to clear all items from your cart?')) {
+        cart = [];
+        saveCartToLocalStorage();
+        renderCartItems();
+      }
+    };
+
+    const renderCartItems = () => {
+      const container = document.getElementById('cartItemsContainer');
+      const summary = document.getElementById('cartSummary');
+      
+      if (!container) return;
+
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="empty-cart">
+            <p>🛒 Your Dugout is empty! Start shopping to add items.</p>
+            <button class="add-to-cart-btn" onclick="closeCartModal()" style="margin-top: 1rem;">Continue Shopping</button>
+          </div>
+        `;
+        summary.style.display = 'none';
+        return;
+      }
+
+      let cartHTML = '';
+      let total = 0;
+
+      cart.forEach(item => {
+        const itemTotal = item.price * (item.quantity || 1);
+        total += itemTotal;
+        cartHTML += `
+          <div class="cart-item">
+            <div class="cart-item-info">
+              <div class="cart-item-name">${item.name}</div>
+              <div class="cart-item-price">₹${item.price} each</div>
+            </div>
+            <div class="cart-item-controls">
+              <div class="qty-control">
+                <button class="qty-btn" onclick="updateQuantity(${item.id}, ${(item.quantity || 1) - 1})">−</button>
+                <span class="qty-display">${item.quantity || 1}</span>
+                <button class="qty-btn" onclick="updateQuantity(${item.id}, ${(item.quantity || 1) + 1})">+</button>
+              </div>
+              <div style="font-weight: 700; min-width: 80px; text-align: right;">₹${itemTotal}</div>
+              <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = cartHTML;
+      
+      const totalPrice = document.getElementById('cartTotalPrice');
+      if (totalPrice) {
+        totalPrice.textContent = `₹${total}`;
+      }
+      
+      summary.style.display = 'block';
+    };
+
+    const openCartModal = () => {
+      const cartModal = document.getElementById('cartModal');
+      if (cartModal) {
+        cartModal.classList.add('active');
+        renderCartItems();
+      }
+    };
+
+    const closeCartModal = () => {
+      const cartModal = document.getElementById('cartModal');
+      if (cartModal) {
+        cartModal.classList.remove('active');
+      }
+    };
+
+    const showProductModal = (title, emoji, price, rating, reviews, description) => {
+      currentProductModal = { title, emoji, price, rating, reviews, description };
+      const productModal = document.getElementById('productModal');
+      
+      if (productModal) {
+        document.getElementById('productModalTitle').textContent = title;
+        document.getElementById('productModalTitle2').textContent = title;
+        document.getElementById('productModalImage').textContent = emoji;
+        document.getElementById('productModalPrice').textContent = price;
+        document.getElementById('productModalRating').textContent = `${rating} (${reviews} reviews)`;
+        document.getElementById('productModalDescription').textContent = description;
+        
+        productModal.classList.add('active');
+      }
+    };
+
+    const closeProductModal = () => {
+      const productModal = document.getElementById('productModal');
+      if (productModal) {
+        productModal.classList.remove('active');
+      }
+      currentProductModal = null;
+    };
+
+    const addToCartFromModal = () => {
+      if (currentProductModal) {
+        // Extract price from the ₹XXX format
+        const priceStr = currentProductModal.price.replace('₹', '').replace(',', '');
+        const price = parseInt(priceStr);
+        addToCart(currentProductModal.title, price);
+        closeProductModal();
+      }
+    };
+
+    const proceedToCheckout = () => {
+      closeCartModal();
       const productsGrid = document.querySelector('.grid');
       const checkoutSection = document.getElementById('checkout');
       
-      if (checkoutSection.style.display === 'none' || checkoutSection.style.display === '') {
+      if (checkoutSection) {
         productsGrid.style.display = 'none';
         checkoutSection.style.display = 'block';
         updateOrderSummary();
-      } else {
-        productsGrid.style.display = 'grid';
-        checkoutSection.style.display = 'none';
       }
     };
 
@@ -164,45 +670,73 @@
       const orderItems = document.getElementById('order-items');
       const totalPrice = document.getElementById('total-price');
       
+      if (!orderItems) return;
+
       orderItems.innerHTML = '';
-      cart.forEach((item, index) => {
+      let total = 0;
+
+      cart.forEach((item) => {
+        const itemTotal = item.price * (item.quantity || 1);
+        total += itemTotal;
         const itemDiv = document.createElement('div');
         itemDiv.className = 'flex justify-between';
         itemDiv.innerHTML = `
-          <span>${item.name}</span>
-          <span>₹${item.price}</span>
+          <span>${item.name} (x${item.quantity || 1})</span>
+          <span>₹${itemTotal}</span>
         `;
         orderItems.appendChild(itemDiv);
       });
       
-      totalPrice.textContent = `₹${total}`;
+      if (totalPrice) {
+        totalPrice.textContent = `₹${total}`;
+      }
     };
 
-    const showProductModal = (title, emoji, price, stars, reviews, description) => {
-      document.getElementById('modal-title').textContent = title;
-      document.getElementById('modal-image').textContent = emoji;
-      document.getElementById('modal-price').textContent = price;
-      document.getElementById('modal-rating').innerHTML = `<span class="text-red-400">${stars}</span> (${reviews} reviews)`;
-      document.getElementById('modal-description').textContent = description;
-      const priceNum = parseInt(price.replace('₹', '').replace(',', ''));
-      document.getElementById('modal-add-to-cart').onclick = () => { addToCart(title, priceNum); closeProductModal(); };
-      document.getElementById('product-modal').classList.remove('hidden');
+    const showCheckout = () => {
+      proceedToCheckout();
     };
 
-    const closeProductModal = () => { document.getElementById('product-modal').classList.add('hidden'); };
+    const showToast = () => {
+      const t = document.getElementById('toast');
+      if (t) {
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
+      }
+    };
 
     // Handle payment form submission
-    document.getElementById('payment-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      alert('Payment processed successfully! (This is a demo - in real implementation, this would connect to a payment gateway)');
-      // Reset cart
-      cart = [];
-      total = 0;
-      updateCartCount();
-      showCheckout(); // Hide checkout and show products
-    });
+    const paymentForm = document.getElementById('payment-form');
+    if (paymentForm) {
+      paymentForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Payment processed successfully! (This is a demo - in real implementation, this would connect to a payment gateway)');
+        // Reset cart
+        cart = [];
+        saveCartToLocalStorage();
+        document.querySelector('.grid').style.display = 'grid';
+        document.getElementById('checkout').style.display = 'none';
+      });
+    }
 
-    document.getElementById('product-modal').addEventListener('click', (e) => { if (e.target.id === 'product-modal') closeProductModal(); });
+    // Close modals when clicking outside
+    document.addEventListener('click', function(event) {
+      const cartModal = document.getElementById('cartModal');
+      const productModal = document.getElementById('productModal');
+      
+      if (cartModal && event.target === cartModal) {
+        closeCartModal();
+      }
+      if (productModal && event.target === productModal) {
+        closeProductModal();
+      }
+    });
+  </script>
+</body>
+
   </script>
 </body>
 </html>
+
+
+
+

@@ -292,11 +292,11 @@
         let activeTeamId = 'csk';
 
         const persistCart = () => {
-            localStorage.setItem('ipl_cart', JSON.stringify(cart));
+            localStorage.setItem('iplCart', JSON.stringify(cart));
         };
 
         const loadCart = () => {
-            const stored = localStorage.getItem('ipl_cart');
+            const stored = localStorage.getItem('iplCart');
             if (stored) {
                 try {
                     cart = JSON.parse(stored);
