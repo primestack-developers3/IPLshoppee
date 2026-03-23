@@ -33,15 +33,23 @@
 
     .product-image {
       width: 100%;
-      height: 200px;
-      background: rgba(30, 41, 59, 0.6);
+      background: rgba(30, 41, 59, 0.35);
       border-radius: 1rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 5rem;
       margin-bottom: 1rem;
       border: 1px dashed rgba(255, 255, 255, 0.1);
+      padding: 0.35rem;
+      box-sizing: border-box;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      border-radius: 0.75rem;
+      display: block;
     }
 
     .product-title {
@@ -190,7 +198,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         <!-- Jersey -->
         <div class="product-card" onclick="showProductModal('CSK Official Jersey 2024', '👕', '₹1,999', '★★★★★', '2,341', 'Premium quality replica jersey featuring the official CSK design for the 2024 season. Made from breathable polyester fabric with moisture-wicking technology. Includes player name and number customization options.')">
-          <div class="product-image">👕</div>
+          <div class="product-image"><img src="../CSK JERSEY/1.png" alt="CSK Official Jersey 2024"></div>
           <h3 class="product-title">CSK Official Jersey 2024</h3>
           <div class="product-price">₹1,999</div>
           <div class="product-rating">
@@ -202,7 +210,7 @@
 
         <!-- Hoodie -->
         <div class="product-card" onclick="showProductModal('CSK Premium Hoodie', '🧥', '₹2,999', '★★★★★', '1,856', 'Comfortable cotton-polyester blend hoodie with CSK logo and team colors. Features a kangaroo pocket, adjustable hood, and ribbed cuffs. Perfect for casual wear and match days.')">
-          <div class="product-image">🧥</div>
+          <div class="product-image"><img src="../CSK JERSEY/2.png" alt="CSK Premium Hoodie"></div>
           <h3 class="product-title">CSK Premium Hoodie</h3>
           <div class="product-price">₹2,999</div>
           <div class="product-rating">
@@ -214,7 +222,7 @@
 
         <!-- Cap -->
         <div class="product-card" onclick="showProductModal('CSK Official Cap', '🧢', '₹799', '★★★★☆', '1,523', 'Classic baseball cap with embroidered CSK logo. Adjustable strap for perfect fit. Made from high-quality cotton twill with curved brim for UV protection.')">
-          <div class="product-image">🧢</div>
+          <div class="product-image"><img src="../CSK JERSEY/3.png" alt="CSK Official Cap"></div>
           <h3 class="product-title">CSK Official Cap</h3>
           <div class="product-price">₹799</div>
           <div class="product-rating">
@@ -226,7 +234,7 @@
 
         <!-- T-Shirt -->
         <div class="product-card" onclick="showProductModal('CSK Classic T-Shirt', '👕', '₹599', '★★★★★', '3,102', 'Comfortable cotton t-shirt with CSK logo print. Available in multiple sizes. Features crew neck, short sleeves, and tagless design for all-day comfort.')">
-          <div class="product-image">👕</div>
+          <div class="product-image"><img src="../CSK JERSEY/4.png" alt="CSK Classic T-Shirt"></div>
           <h3 class="product-title">CSK Classic T-Shirt</h3>
           <div class="product-price">₹599</div>
           <div class="product-rating">
@@ -378,6 +386,18 @@
             <span>(1,234 reviews)</span>
           </div>
           <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('CSK Phone Case', 799)">Add to Cart</button>
+        </div>
+
+        <!-- Extra item -->
+        <div class="product-card" onclick="showProductModal('CSK Collector Pyjama', '👖', '₹999', '★★★★☆', '942', 'CSK themed comfortable fan pyjama with soft cotton blend and team print for everyday use.')">
+          <div class="product-image"><img src="../CSK JERSEY/16.png" alt="CSK Collector Pyjama"></div>
+          <h3 class="product-title">CSK Collector Pyjama</h3>
+          <div class="product-price">₹999</div>
+          <div class="product-rating">
+            <span class="stars">★★★★☆</span>
+            <span>(942 reviews)</span>
+          </div>
+          <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('CSK Pyjama', 999)">Add to Cart</button>
         </div>
       </div>
     </div>
