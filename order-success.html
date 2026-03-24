@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed | IPL PRO Fan Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #0a0a0c;
+            color: #f1f5f9;
+        }
+
+        .success-animation {
+            animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .checkmark {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 2rem;
+        }
+
+        .success-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 0.875rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .order-details {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: rgba(241, 245, 249, 0.6);
+            font-size: 0.875rem;
+        }
+
+        .detail-value {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center py-8 px-4">
+    <div class="success-animation">
+        <div class="success-card">
+            <!-- Checkmark -->
+            <div class="checkmark">
+                ✓
+            </div>
+
+            <!-- Message -->
+            <h1 class="text-3xl font-black italic tracking-tighter uppercase mb-2">
+                Order <span class="text-green-400">Confirmed</span>
+            </h1>
+            <p class="text-slate-400 text-sm mb-6">
+                Your payment has been successfully processed
+            </p>
+
+            <!-- Order Details -->
+            <div class="order-details">
+                <div class="detail-row">
+                    <span class="detail-label">Order ID</span>
+                    <span class="detail-value" id="orderId">--</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Amount Paid</span>
+                    <span class="detail-value" id="orderAmount">₹--</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value text-green-400">NEW</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Timestamp</span>
+                    <span class="detail-value" id="orderTime">--</span>
+                </div>
+            </div>
+
+            <!-- Info Message -->
+            <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6 text-left">
+                <p class="text-sm text-blue-200">
+                    📧 A confirmation email has been sent to you. Your order will be processed and shipped within 3-5 business days.
+                </p>
+                <p class="text-sm text-blue-200 mt-2">
+                    ⏰ If product is unavailable, refund will be processed within 24 hours.
+                </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-3">
+                <a href="home.html" class="btn-primary block text-center">
+                    Continue Shopping
+                </a>
+                <button
+                    onclick="window.location.href='admin/orders.html'"
+                    class="w-full text-slate-400 hover:text-slate-300 border border-slate-600 hover:border-slate-400 py-2 px-4 rounded-lg transition-colors"
+                >
+                    View Orders (Admin)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get order ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+
+        if (orderId) {
+            document.getElementById('orderId').textContent = orderId;
+        }
+
+        // Get order amount from session if available
+        const totalAmount = sessionStorage.getItem('checkoutTotal');
+        if (totalAmount) {
+            document.getElementById('orderAmount').textContent = '₹' + totalAmount;
+            sessionStorage.removeItem('checkoutTotal');
+        }
+
+        // Set timestamp
+        const now = new Date();
+        document.getElementById('orderTime').textContent = now.toLocaleString('en-IN');
+    </script>
+</body>
+</html>

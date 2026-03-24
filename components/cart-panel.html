@@ -1,0 +1,389 @@
+<!-- UNIVERSAL CART PANEL - Include this in all pages -->
+<!-- Add this after the header, as the second component in <body> -->
+
+<style>
+  /* Cart Panel Styles */
+  .iplpro-cart-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    max-width: 500px;
+    background: rgba(15, 23, 42, 0.98);
+    backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .iplpro-cart-panel.open {
+    transform: translateX(0);
+  }
+
+  .iplpro-cart-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .iplpro-cart-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Cart Panel Header */
+  .iplpro-cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .iplpro-cart-header h2 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    margin: 0;
+  }
+
+  .iplpro-cart-close {
+    background: none;
+    border: none;
+    color: #f1f5f9;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .iplpro-cart-close:hover {
+    transform: rotate(90deg);
+    color: #ef4444;
+  }
+
+  /* Cart Items Container */
+  .iplpro-cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .iplpro-cart-item {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .iplpro-cart-item-info {
+    flex: 1;
+  }
+
+  .iplpro-cart-item-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .iplpro-cart-item-price {
+    font-size: 0.85rem;
+    color: #cbd5e1;
+  }
+
+  .iplpro-cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .iplpro-qty-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #60a5fa;
+    width: 28px;
+    height: 28px;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.2s ease;
+  }
+
+  .iplpro-qty-btn:hover {
+    background: rgba(37, 99, 235, 0.2);
+  }
+
+  .iplpro-qty-display {
+    min-width: 30px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .iplpro-cart-remove {
+    background: rgba(239, 68, 68, 0.2);
+    border: none;
+    color: #ef4444;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .iplpro-cart-remove:hover {
+    background: rgba(239, 68, 68, 0.3);
+  }
+
+  /* Empty Cart Message */
+  .iplpro-cart-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    color: #cbd5e1;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .iplpro-cart-empty svg {
+    width: 80px;
+    height: 80px;
+    opacity: 0.3;
+  }
+
+  /* Cart Footer */
+  .iplpro-cart-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .iplpro-cart-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .iplpro-cart-summary label {
+    font-weight: 600;
+    color: #cbd5e1;
+  }
+
+  .iplpro-cart-total {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #60a5fa;
+  }
+
+  .iplpro-cart-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .iplpro-checkout-btn {
+    flex: 1;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+  }
+
+  .iplpro-checkout-btn:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    transform: translateY(-2px);
+  }
+
+  .iplpro-clear-cart-btn {
+    flex: 1;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+  }
+
+  .iplpro-clear-cart-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    border-color: rgba(239, 68, 68, 0.5);
+  }
+
+  /* Scrollbar Styling */
+  .iplpro-cart-items::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .iplpro-cart-items::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .iplpro-cart-items::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+
+  .iplpro-cart-items::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .iplpro-cart-panel {
+      max-width: 100%;
+    }
+  }
+</style>
+
+<!-- Cart Overlay -->
+<div class="iplpro-cart-overlay" id="cartOverlay" onclick="closeCartPanel()"></div>
+
+<!-- Cart Panel -->
+<div class="iplpro-cart-panel" id="cartPanel">
+  <!-- Header -->
+  <div class="iplpro-cart-header">
+    <h2>🛒 Your Cart</h2>
+    <button class="iplpro-cart-close" onclick="closeCartPanel()">✕</button>
+  </div>
+
+  <!-- Items -->
+  <div class="iplpro-cart-items" id="cartItemsContainer">
+    <!-- Items will be rendered here -->
+  </div>
+
+  <!-- Footer -->
+  <div class="iplpro-cart-footer">
+    <div class="iplpro-cart-summary">
+      <label>Total:</label>
+      <div class="iplpro-cart-total">₹<span id="cartTotalPrice">0</span></div>
+    </div>
+    <div class="iplpro-cart-actions">
+      <button class="iplpro-checkout-btn" onclick="proceedToCheckout()">Checkout</button>
+      <button class="iplpro-clear-cart-btn" onclick="clearAllCart()">Clear</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Open Cart Panel
+  function openCartPanel() {
+    const panel = document.getElementById('cartPanel');
+    const overlay = document.getElementById('cartOverlay');
+    if (panel) {
+      panel.classList.add('open');
+      overlay.classList.add('show');
+      updateCartDisplay();
+    }
+  }
+
+  // Close Cart Panel
+  function closeCartPanel() {
+    const panel = document.getElementById('cartPanel');
+    const overlay = document.getElementById('cartOverlay');
+    if (panel) {
+      panel.classList.remove('open');
+      overlay.classList.remove('show');
+    }
+  }
+
+  // Update Cart Display
+  function updateCartDisplay() {
+    const cart = getCart();
+    const container = document.getElementById('cartItemsContainer');
+    
+    if (!container) return;
+
+    if (cart.length === 0) {
+      container.innerHTML = `
+        <div class="iplpro-cart-empty">
+          <div style="font-size: 3rem;">🛒</div>
+          <div>Your cart is empty</div>
+          <button onclick="closeCartPanel()" class="iplpro-nav-btn">Continue Shopping</button>
+        </div>
+      `;
+      return;
+    }
+
+    let itemsHTML = '';
+    let total = 0;
+
+    cart.forEach(item => {
+      const itemTotal = item.price * (item.quantity || 1);
+      total += itemTotal;
+      itemsHTML += `
+        <div class="iplpro-cart-item">
+          <div class="iplpro-cart-item-info">
+            <div class="iplpro-cart-item-name">${item.name}</div>
+            <div class="iplpro-cart-item-price">₹${item.price}</div>
+          </div>
+          <div class="iplpro-cart-item-controls">
+            <button class="iplpro-qty-btn" onclick="updateQuantity('${item.id}', ${(item.quantity || 1) - 1})">−</button>
+            <span class="iplpro-qty-display">${item.quantity || 1}</span>
+            <button class="iplpro-qty-btn" onclick="updateQuantity('${item.id}', ${(item.quantity || 1) + 1})">+</button>
+            <button class="iplpro-cart-remove" onclick="removeFromCart('${item.id}')">Remove</button>
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = itemsHTML;
+
+    // Update total
+    const priceEl = document.getElementById('cartTotalPrice');
+    if (priceEl) {
+      priceEl.textContent = total;
+    }
+  }
+
+  // Proceed to Checkout
+  function proceedToCheckout() {
+    const cart = getCart();
+    if (cart.length === 0) {
+      alert('Your cart is empty!');
+      return;
+    }
+    
+    const total = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+    sessionStorage.setItem('checkoutTotal', total);
+    
+    // Redirect to checkout
+    window.location.href = window.location.pathname.includes('IPL') 
+      ? '../../checkout.html' 
+      : './checkout.html';
+  }
+
+  // Listen for cart updates
+  window.addEventListener('cartUpdated', updateCartDisplay);
+</script>

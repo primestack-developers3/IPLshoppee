@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MI - Mumbai Indians | Official Merchandise</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../../cart-manager.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Space Grotesk', sans-serif; background-color: #0a0a0c; color: #f1f5f9; }
@@ -373,21 +374,25 @@
   </style>
 </head>
 <body class="selection:bg-blue-500/30">
-  <!-- Navigation Bar -->
-  <div class="nav-bar fixed top-0 w-full z-50">
-    <a href="../home.html" class="nav-brand">
-      <div class="team-logo">🦁</div>
-      <div>
-        <h2 class="text-lg font-black tracking-tight">IPL <span style="color: #0400ff;">PRO</span></h2>
-      </div>
-    </a>
-    <div class="flex items-center gap-4">
-      <button id="cart-btn" class="text-white hover:text-yellow-400 transition-colors" onclick="openCartModal()">
-        🛒 <span id="cart-count" class="bg-blue-500 text-black px-2 py-1 rounded-full text-xs font-bold">0</span>
-      </button>
-      <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">MI Official Store</div>
-    </div>
-  </div>
+  <!-- Header Component -->
+  <div id="header-container"></div>
+  <script>
+    fetch('../../components/header.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('header-container').innerHTML = html;
+        initializeCart();
+        updateCartCount();
+      });
+  </script>
+
+  <!-- Cart Panel Component -->
+  <div id="cart-panel-container"></div>
+  <script>
+    fetch('../../components/cart-panel.html')
+      .then(response => response.text())
+      .then(html => document.getElementById('cart-panel-container').innerHTML = html);
+  </script>
 
   <!-- Main Content -->
   <main class="pt-24 px-6 pb-10">
@@ -542,29 +547,6 @@
     </div>
   </main>
 
-  <!-- Cart Modal -->
-  <div class="modal-overlay" id="cartModal">
-    <div class="modal-container">
-      <div class="modal-header">
-        <h2>🛒 Your Dugout</h2>
-        <button class="close-btn" onclick="closeCartModal()">×</button>
-      </div>
-      <div class="modal-body" id="cartItemsContainer">
-        <!-- Cart items will be rendered here -->
-      </div>
-      <div class="cart-summary" id="cartSummary" style="display: none;">
-        <div class="cart-total">
-          <span>Total:</span>
-          <span id="cartTotalPrice">₹0</span>
-        </div>
-        <div class="cart-actions">
-          <button class="checkout-btn" onclick="proceedToCheckout()">Checkout</button>
-          <button class="clear-cart-btn" onclick="clearAllCart()">Clear Cart</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Product Detail Modal -->
   <div class="modal-overlay product-detail-modal" id="productModal">
     <div class="modal-container">
@@ -591,254 +573,6 @@
 
   <div class="toast-notification" id="toast">Added to Dugout! 🏏</div>
 
-  <script>
-    // Get cart from localStorage or initialize empty
-    let cart = JSON.parse(localStorage.getItem('iplCart')) || [];
-    let currentProductModal = null;
 
-    // Initialize cart on page load
-    window.addEventListener('DOMContentLoaded', () => {
-      updateCartCount();
-      renderCartItems();
-    });
-
-    const saveCartToLocalStorage = () => {
-      localStorage.setItem('iplCart', JSON.stringify(cart));
-      updateCartCount();
-    };
-
-    const updateCartCount = () => {
-      const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-      const cartCount = document.getElementById('cart-count');
-      if (cartCount) {
-        cartCount.textContent = count;
-      }
-    };
-
-    const addToCart = (productName, price) => {
-      // Check if product already exists in cart
-      const existingItem = cart.find(item => item.name === productName);
-      
-      if (existingItem) {
-        existingItem.quantity = (existingItem.quantity || 1) + 1;
-      } else {
-        cart.push({
-          name: productName,
-          price: price,
-          quantity: 1,
-          id: Date.now() // unique ID for each cart entry
-        });
-      }
-      
-      saveCartToLocalStorage();
-      showToast();
-      console.log(`Added to cart: ${productName} - ₹${price}`);
-    };
-
-    const removeFromCart = (id) => {
-      cart = cart.filter(item => item.id !== id);
-      saveCartToLocalStorage();
-      renderCartItems();
-    };
-
-    const updateQuantity = (id, quantity) => {
-      if (quantity <= 0) {
-        removeFromCart(id);
-        return;
-      }
-      const item = cart.find(item => item.id === id);
-      if (item) {
-        item.quantity = quantity;
-        saveCartToLocalStorage();
-        renderCartItems();
-      }
-    };
-
-    const clearAllCart = () => {
-      if (confirm('Are you sure you want to clear all items from your cart?')) {
-        cart = [];
-        saveCartToLocalStorage();
-        renderCartItems();
-      }
-    };
-
-    const renderCartItems = () => {
-      const container = document.getElementById('cartItemsContainer');
-      const summary = document.getElementById('cartSummary');
-      
-      if (!container) return;
-
-      if (cart.length === 0) {
-        container.innerHTML = `
-          <div class="empty-cart">
-            <p>🛒 Your Dugout is empty! Start shopping to add items.</p>
-            <button class="add-to-cart-btn" onclick="closeCartModal()" style="margin-top: 1rem;">Continue Shopping</button>
-          </div>
-        `;
-        summary.style.display = 'none';
-        return;
-      }
-
-      let cartHTML = '';
-      let total = 0;
-
-      cart.forEach(item => {
-        const itemTotal = item.price * (item.quantity || 1);
-        total += itemTotal;
-        cartHTML += `
-          <div class="cart-item">
-            <div class="cart-item-info">
-              <div class="cart-item-name">${item.name}</div>
-              <div class="cart-item-price">₹${item.price} each</div>
-            </div>
-            <div class="cart-item-controls">
-              <div class="qty-control">
-                <button class="qty-btn" onclick="updateQuantity(${item.id}, ${(item.quantity || 1) - 1})">−</button>
-                <span class="qty-display">${item.quantity || 1}</span>
-                <button class="qty-btn" onclick="updateQuantity(${item.id}, ${(item.quantity || 1) + 1})">+</button>
-              </div>
-              <div style="font-weight: 700; min-width: 80px; text-align: right;">₹${itemTotal}</div>
-              <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
-            </div>
-          </div>
-        `;
-      });
-
-      container.innerHTML = cartHTML;
-      
-      const totalPrice = document.getElementById('cartTotalPrice');
-      if (totalPrice) {
-        totalPrice.textContent = `₹${total}`;
-      }
-      
-      summary.style.display = 'block';
-    };
-
-    const openCartModal = () => {
-      const cartModal = document.getElementById('cartModal');
-      if (cartModal) {
-        cartModal.classList.add('active');
-        renderCartItems();
-      }
-    };
-
-    const closeCartModal = () => {
-      const cartModal = document.getElementById('cartModal');
-      if (cartModal) {
-        cartModal.classList.remove('active');
-      }
-    };
-
-    const showProductModal = (title, emoji, price, rating, reviews, description) => {
-      currentProductModal = { title, emoji, price, rating, reviews, description };
-      const productModal = document.getElementById('productModal');
-      
-      if (productModal) {
-        document.getElementById('productModalTitle').textContent = title;
-        document.getElementById('productModalTitle2').textContent = title;
-        document.getElementById('productModalImage').textContent = emoji;
-        document.getElementById('productModalPrice').textContent = price;
-        document.getElementById('productModalRating').textContent = `${rating} (${reviews} reviews)`;
-        document.getElementById('productModalDescription').textContent = description;
-        
-        productModal.classList.add('active');
-      }
-    };
-
-    const closeProductModal = () => {
-      const productModal = document.getElementById('productModal');
-      if (productModal) {
-        productModal.classList.remove('active');
-      }
-      currentProductModal = null;
-    };
-
-    const addToCartFromModal = () => {
-      if (currentProductModal) {
-        // Extract price from the ₹XXX format
-        const priceStr = currentProductModal.price.replace('₹', '').replace(',', '');
-        const price = parseInt(priceStr);
-        addToCart(currentProductModal.title, price);
-        closeProductModal();
-      }
-    };
-
-    const proceedToCheckout = () => {
-      closeCartModal();
-      const productsGrid = document.querySelector('.grid');
-      const checkoutSection = document.getElementById('checkout');
-      
-      if (checkoutSection) {
-        productsGrid.style.display = 'none';
-        checkoutSection.style.display = 'block';
-        updateOrderSummary();
-      }
-    };
-
-    const updateOrderSummary = () => {
-      const orderItems = document.getElementById('order-items');
-      const totalPrice = document.getElementById('total-price');
-      
-      if (!orderItems) return;
-
-      orderItems.innerHTML = '';
-      let total = 0;
-
-      cart.forEach((item) => {
-        const itemTotal = item.price * (item.quantity || 1);
-        total += itemTotal;
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'flex justify-between';
-        itemDiv.innerHTML = `
-          <span>${item.name} (x${item.quantity || 1})</span>
-          <span>₹${itemTotal}</span>
-        `;
-        orderItems.appendChild(itemDiv);
-      });
-      
-      if (totalPrice) {
-        totalPrice.textContent = `₹${total}`;
-      }
-    };
-
-    const showCheckout = () => {
-      proceedToCheckout();
-    };
-
-    const showToast = () => {
-      const t = document.getElementById('toast');
-      if (t) {
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2000);
-      }
-    };
-
-    // Handle payment form submission
-    const paymentForm = document.getElementById('payment-form');
-    if (paymentForm) {
-      paymentForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Payment processed successfully! (This is a demo - in real implementation, this would connect to a payment gateway)');
-        // Reset cart
-        cart = [];
-        saveCartToLocalStorage();
-        document.querySelector('.grid').style.display = 'grid';
-        document.getElementById('checkout').style.display = 'none';
-      });
-    }
-
-    // Close modals when clicking outside
-    document.addEventListener('click', function(event) {
-      const cartModal = document.getElementById('cartModal');
-      const productModal = document.getElementById('productModal');
-      
-      if (cartModal && event.target === cartModal) {
-        closeCartModal();
-      }
-      if (productModal && event.target === productModal) {
-        closeProductModal();
-      }
-    });
-  </script>
 </body>
 </html>

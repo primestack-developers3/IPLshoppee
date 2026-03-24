@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | IPL PRO Fan Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #0a0a0c;
+            color: #f1f5f9;
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 0.875rem 1rem;
+            color: #f1f5f9;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(37, 99, 235, 0.5);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: rgba(241, 245, 249, 0.4);
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .form-group.error .form-input {
+            border-color: rgba(239, 68, 68, 0.5);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .form-group.error .error-message {
+            display: block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 0.875rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #2563eb;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transform: translateY(calc(100% + 1rem));
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast.error {
+            background: #ef4444;
+        }
+
+        .toast.success {
+            background: #10b981;
+        }
+
+        .order-summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .order-summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            color: #fbbf24;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8 px-4">
+    <div class="max-w-2xl mx-auto">
+
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-black italic tracking-tighter uppercase">Secure <span class="text-blue-500">Checkout</span></h1>
+            <p class="text-slate-400 text-sm mt-2">Complete your order securely</p>
+        </div>
+
+        <!-- Warning Message -->
+        <div class="warning-box">
+            ⏰ If product is unavailable, refund will be processed within 24 hours.
+        </div>
+
+        <!-- Customer Details Section -->
+        <div class="section">
+            <div class="section-title">
+                <span>👤</span>
+                <span>Customer Details</span>
+            </div>
+
+            <form id="checkoutForm">
+                <div class="form-group mb-4">
+                    <label class="block text-sm font-600 mb-2" for="fullName">Full Name</label>
+                    <input
+                        type="text"
+                        id="fullName"
+                        name="fullName"
+                        class="form-input"
+                        placeholder="Enter your full name"
+                        required
+                    />
+                    <div class="error-message">Full name is required</div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="block text-sm font-600 mb-2" for="phone">Phone Number</label>
+                    <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        class="form-input"
+                        placeholder="Enter 10-digit phone number"
+                        pattern="\d{10}"
+                        required
+                    />
+                    <div class="error-message">Valid 10-digit phone number required</div>
+                </div>
+
+                <div class="form-group mb-6">
+                    <label class="block text-sm font-600 mb-2" for="address">Full Address</label>
+                    <textarea
+                        id="address"
+                        name="address"
+                        class="form-input"
+                        placeholder="Enter your complete address (street, city, state, pincode)"
+                        rows="4"
+                        required
+                    ></textarea>
+                    <div class="error-message">Address is required</div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Order Summary Section -->
+        <div class="section">
+            <div class="section-title">
+                <span>📦</span>
+                <span>Order Summary</span>
+            </div>
+
+            <div id="orderSummary" class="mb-6">
+                <!-- Items will be rendered here -->
+            </div>
+
+            <div class="border-t border-blue-500 pt-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-lg font-700">Total Amount</span>
+                    <span class="text-2xl font-black text-blue-400">₹<span id="totalAmount">0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Section -->
+        <div class="section">
+            <div class="section-title">
+                <span>💳</span>
+                <span>Payment</span>
+            </div>
+
+            <button
+                id="payNowBtn"
+                class="btn-primary"
+                onclick="handlePayment()"
+            >
+                Pay Now with Razorpay
+            </button>
+
+            <p class="text-slate-500 text-xs text-center mt-4">
+                ✓ Secure payment powered by Razorpay<br/>
+                ✓ Your data is encrypted and protected
+            </p>
+        </div>
+
+        <!-- Back to Cart Link -->
+        <div class="text-center">
+            <button
+                class="text-blue-400 hover:text-blue-300 text-sm font-600 transition-colors"
+                onclick="goBackToCart()"
+            >
+                ← Back to Cart
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Razorpay Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- Scripts -->
+    <script src="cart-manager.js"></script>
+    <script src="checkout.js"></script>
+</body>
+</html>

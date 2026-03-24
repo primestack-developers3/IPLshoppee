@@ -7,6 +7,7 @@
     <title>IPL PRO | Official Fan Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="./cart-manager.js"></script>
     <style>
         body {
             font-family: 'Space Grotesk', sans-serif;
@@ -15,11 +16,6 @@
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .nav-blur {
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
-        }
 
         .view-section {
             display: none;
@@ -55,119 +51,30 @@
         .toast-notification.show {
             transform: translateY(0);
         }
-
-        .teams-dropdown {
-            position: absolute;
-            top:full;
-            left:0;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease-out;
-            pointer-events: none;
-            z-index: 40;
-        }
-
-        .teams-dropdown.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-
-        .teams-dropdown-content {
-            background: rgba(15, 15, 18, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1.5rem;
-            padding: 1rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 0.5rem;
-            min-width: 600px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        .team-link {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            border-radius: 1rem;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #f1f5f9;
-            transition: all 0.2s ease-out;
-            border: 1px solid transparent;
-            text-transform: uppercase;
-        }
-
-        .team-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateX(4px);
-        }
     </style>
 </head>
 <body class="selection:bg-blue-500/30">
 
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 nav-blur border-b border-white/5 px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-3 cursor-pointer" onclick="showView('home')">
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-            </div>
-            <h1 class="text-xl font-black tracking-tighter">IPL <span class="text-blue-500">PRO</span></h1>
-        </div>
+    <!-- Header Component -->
+    <div id="header-container"></div>
+    <script>
+      fetch('./components/header.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('header-container').innerHTML = html;
+          // Initialize cart count after header loads
+          initializeCart();
+          updateCartCount();
+        });
+    </script>
 
-        <div class="hidden lg:flex items-center gap-8 text-xs font-bold uppercase tracking-widest text-slate-400">
-            <button onclick="showView('home')" class="nav-link hover:text-white transition-colors" data-view="home">Home</button>
-            <button onclick="showView('shop')" class="nav-link hover:text-white transition-colors" data-view="shop">Collections</button>
-            <button onclick="showView('shipping')" class="nav-link hover:text-white transition-colors" data-view="shipping">Shipping</button>
-            <button onclick="showView('contact')" class="nav-link hover:text-white transition-colors" data-view="contact">Contact</button>
-        </div>
-
-        <!-- Teams Dropdown -->
-        <div class="relative hidden lg:block">
-            <button onclick="toggleTeamsDropdown()" class="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors group">
-                🏆 Teams
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-180 transition-transform"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div id="teams-dropdown" class="teams-dropdown">
-                <div class="teams-dropdown-content">
-                    <a href="IPL teams/csk.html" class="team-link">🦁 CSK</a>
-                    <a href="IPL teams/rcb.html" class="team-link">🐅 RCB</a>
-                    <a href="IPL teams/mi.html" class="team-link">🌀 MI</a>
-                    <a href="IPL teams/kkr.html" class="team-link">⚔️ KKR</a>
-                    <a href="IPL teams/rr.html" class="team-link">🏰 RR</a>
-                    <a href="IPL teams/srh.html" class="team-link">🦅 SRH</a>
-                    <a href="IPL teams/gt.html" class="team-link">⚡ GT</a>
-                    <a href="IPL teams/lsg.html" class="team-link">🕊️ LSG</a>
-                    <a href="IPL teams/dc.html" class="team-link">🐅 DC</a>
-                    <a href="IPL teams/pbks.html" class="team-link">🦁 PBKS</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex items-center gap-3">
-            <button onclick="showView('cart')" class="relative p-2 hover:bg-white/5 rounded-full transition-all group mr-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:scale-110 transition-transform"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-red-600 text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-black">0</span>
-            </button>
-            
-            <!-- User Profile Section -->
-            <div id="user-profile" class="flex items-center gap-3 pl-3 border-l border-white/10">
-                <div class="text-right hidden sm:block">
-                    <p id="user-name" class="text-[10px] font-black uppercase tracking-widest text-white leading-none">Loading...</p>
-                    <button onclick="handleLogout()" class="text-[9px] font-bold text-slate-500 hover:text-red-500 uppercase tracking-tighter">Sign Out</button>
-                </div>
-                <div id="user-avatar" class="w-9 h-9 rounded-full bg-blue-600/20 border border-white/10 overflow-hidden flex items-center justify-center text-xs font-bold">
-                    ?
-                </div>
-            </div>
-        </div>
-    </nav>
+    <!-- Cart Panel Component -->
+    <div id="cart-panel-container"></div>
+    <script>
+      fetch('./components/cart-panel.html')
+        .then(response => response.text())
+        .then(html => document.getElementById('cart-panel-container').innerHTML = html);
+    </script>
 
     <!-- VIEWS -->
     <main class="pt-24 min-h-[80vh]">
@@ -288,24 +195,7 @@
         const auth = getAuth(app);
 
         // State & Data
-        let cart = [];
         let activeTeamId = 'csk';
-
-        const persistCart = () => {
-            localStorage.setItem('iplCart', JSON.stringify(cart));
-        };
-
-        const loadCart = () => {
-            const stored = localStorage.getItem('iplCart');
-            if (stored) {
-                try {
-                    cart = JSON.parse(stored);
-                } catch (error) {
-                    cart = [];
-                    console.warn('Invalid cart state in localStorage, resetting cart.');
-                }
-            }
-        };
 
         const TEAMS = [{ id: 'csk', name: 'Chennai Super Kings', color: '#F9CD05', logo: '🦁' },{ id: 'rcb', name: 'Royal Challengers Bengaluru', color: '#E21C23', logo: '🐅' },{ id: 'mi', name: 'Mumbai Indians', color: '#004BA0', logo: '🌀' },{ id: 'kkr', name: 'Kolkata Knight Riders', color: '#3A225D', logo: '⚔️' },{ id: 'rr', name: 'Rajasthan Royals', color: '#EA1A85', logo: '🏰' },{ id: 'srh', name: 'Sunrisers Hyderabad', color: '#FF822E', logo: '🦅' },{ id: 'gt', name: 'Gujarat Titans', color: '#1B2133', logo: '⚡' },{ id: 'lsg', name: 'Lucknow Super Giants', color: '#0057E7', logo: '🕊️' },{ id: 'dc', name: 'Delhi Capitals', color: '#000080', logo: '🐅' },{ id: 'pbks', name: 'Punjab Kings', color: '#ED1B24', logo: '🦁' }];
         const MERCH = [{ id: 'jersey', name: 'Jersey', price: 1999, img: '👕' },{ id: 'cap', name: 'Cap', price: 799, img: '🧢' },{ id: 'hoodie', name: 'Hoodie', price: 2999, img: '🧥' }];
@@ -400,42 +290,22 @@
 
         window.addToCart = (itemId, teamId) => {
             const itemBase = TRENDING.find(p => p.id === itemId) || MERCH.find(m => m.id === itemId);
-            cart.push({...itemBase, cartId: Date.now()});
-            persistCart();
-            updateCartCount();
-            showToast();
+            // Use unified addToCart function from cart-manager.js
+            addToCart(itemBase.name, itemBase.price, itemId);
+            // Update cart display in panel
+            updateCartDisplay();
         };
 
         const updateCartCount = () => {
-            const el = document.getElementById('cart-count');
-            el.innerText = cart.length;
-            el.classList.toggle('hidden', cart.length === 0);
+            // Cart badge is now handled by cart-manager.js and the header component
         };
 
         const renderCart = () => {
-            const itemsEl = document.getElementById('cart-items');
-            const emptyEl = document.getElementById('cart-empty');
-            const summaryEl = document.getElementById('cart-summary');
-            if(cart.length === 0) { itemsEl.innerHTML = ''; emptyEl.classList.remove('hidden'); summaryEl.classList.add('hidden'); return; }
-            emptyEl.classList.add('hidden'); summaryEl.classList.remove('hidden');
-            itemsEl.innerHTML = cart.map(item => `<div class="bg-white/5 p-6 rounded-2xl flex items-center justify-between"><div><p class="font-bold">${item.name}</p><p class="text-xl font-black">₹${item.price}</p></div><button onclick="removeFromCart(${item.cartId})" class="text-red-500 font-bold uppercase text-xs">Remove</button></div>`).join('');
-            
-            // Update order summary
-            const orderItemsSummary = document.getElementById('order-items-summary');
-            orderItemsSummary.innerHTML = cart.map(item => `
-                <div class="flex justify-between items-center">
-                    <span>${item.name}</span>
-                    <span>₹${item.price}</span>
-                </div>
-            `).join('');
-            
-            const total = cart.reduce((s, i) => s + i.price, 0);
-            const totalWithGST = (total * 1.18).toFixed(0);
-            document.getElementById('total-price').innerText = `₹${totalWithGST}`;
+            // Cart display is now handled by the cart-panel component
         };
 
-        window.removeFromCart = (cid) => { cart = cart.filter(i => i.cartId !== cid); persistCart(); renderCart(); updateCartCount(); };
-        const showToast = () => { const t = document.getElementById('toast'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); };
+        window.removeFromCart = (cid) => { /* Handled by cart-manager.js */ };
+        const showToast = () => { /* Handled by cart-manager.js */ };
         
         // Payment form handler
         document.getElementById('payment-form').addEventListener('submit', (e) => {
@@ -448,7 +318,8 @@
         });
 
         window.onload = () => {
-            loadCart();
+            // Cart is initialized by cart-manager.js
+            initializeCart();
             updateCartCount();
             renderHome();
         };
