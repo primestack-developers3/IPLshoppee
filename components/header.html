@@ -229,15 +229,15 @@
 <header class="iplpro-header">
   <div class="iplpro-header-content">
     <!-- Logo & Brand -->
-    <a href="index.html" class="iplpro-brand" onclick="if(window.location.pathname.includes('IPL')) window.location.href='../../index.html'; return false;">
+    <a href="javascript:void(0)" class="iplpro-brand" onclick="navigateTo('index')">
       <div class="iplpro-logo">🏏</div>
       <div class="iplpro-title">IPL <span class="highlight">PRO</span></div>
     </a>
 
     <!-- Navigation Links -->
     <div class="iplpro-nav-links">
-      <a href="index.html" class="iplpro-nav-btn" id="nav-home">Home</a>
-      <a href="home.html" class="iplpro-nav-btn" id="nav-shop">Shop</a>
+      <a href="javascript:void(0)" class="iplpro-nav-btn" id="nav-home" onclick="navigateTo('index')">Home</a>
+      <a href="javascript:void(0)" class="iplpro-nav-btn" id="nav-shop" onclick="navigateTo('home')">Shop</a>
       
       <!-- Teams Dropdown -->
       <div style="position: relative;">
@@ -246,16 +246,16 @@
           <span style="font-size: 0.7rem; margin-left: 0.25rem;">▼</span>
         </button>
         <div class="iplpro-teams-dropdown" id="teams-menu">
-          <a href="IPL teams/csk.html" class="iplpro-team-link">🦁 CSK</a>
-          <a href="IPL teams/rcb.html" class="iplpro-team-link">🐅 RCB</a>
-          <a href="IPL teams/mi.html" class="iplpro-team-link">🌀 MI</a>
-          <a href="IPL teams/kkr.html" class="iplpro-team-link">⚔️ KKR</a>
-          <a href="IPL teams/rr.html" class="iplpro-team-link">🏰 RR</a>
-          <a href="IPL teams/srh.html" class="iplpro-team-link">🦅 SRH</a>
-          <a href="IPL teams/gt.html" class="iplpro-team-link">⚡ GT</a>
-          <a href="IPL teams/lsg.html" class="iplpro-team-link">🕊️ LSG</a>
-          <a href="IPL teams/dc.html" class="iplpro-team-link">🐅 DC</a>
-          <a href="IPL teams/pbks.html" class="iplpro-team-link">🦁 PBKS</a>
+          <a href="javascript:void(0)" class="iplpro-team-link" onclick="navigateToTeam('csk')">🦁 CSK</a>
+          <a href="javascript:void(0)" class="iplpro-team-link" onclick="navigateToTeam('rcb')">🐅 RCB</a>
+          <a href="javascript:void(0)" class="iplpro-team-link" onclick="navigateToTeam('mi')">🌀 MI</a>
+          <a href="javascript:void(0)" class="iplpro-team-link" onclick="navigateToTeam('kkr')">⚔️ KKR</a>
+          <a href="javascript:void(0)" class="iplpro-team-link" onclick="navigateToTeam('rr')">🏰 RR</a>
+          <a href="javascript:void(0)" class="iplpro-team-link" onclick="navigateToTeam('srh')">🦅 SRH</a>
+          <a href="javascript:void(0)" class="iplpro-team-link" onclick="navigateToTeam('gt')">⚡ GT</a>
+          <a href="javascript:void(0)" class="iplpro-team-link" onclick="navigateToTeam('lsg')">🕊️ LSG</a>
+          <a href="javascript:void(0)" class="iplpro-team-link" onclick="navigateToTeam('dc')">🐅 DC</a>
+          <a href="javascript:void(0)" class="iplpro-team-link" onclick="navigateToTeam('pbks')">🦁 PBKS</a>
         </div>
       </div>
     </div>
@@ -271,6 +271,21 @@
 </header>
 
 <script>
+  function getNavBasePath() {
+    return (window.location.pathname.includes('IPL teams') || window.location.pathname.includes('/IPL teams/')) ? '../../' : '';
+  }
+
+  function navigateTo(page) {
+    const base = getNavBasePath();
+    if (page === 'index') window.location.href = base + 'index.html';
+    if (page === 'home') window.location.href = base + 'home.html';
+  }
+
+  function navigateToTeam(teamCode) {
+    const base = getNavBasePath();
+    window.location.href = `${base}IPL teams/${teamCode}.html`;
+  }
+
   // Toggle Teams Dropdown
   function toggleTeamsMenu() {
     const menu = document.getElementById('teams-menu');
