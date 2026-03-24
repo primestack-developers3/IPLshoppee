@@ -1,8 +1,5 @@
-<!-- UNIVERSAL NAVIGATION & CART HEADER - Include this in all pages -->
-<!-- Add this right after <body> tag in every HTML file -->
-
 <style>
-  /* Universal Navigation Styles */
+  /* --- Navigation Styles --- */
   .iplpro-header {
     position: fixed;
     top: 0;
@@ -13,6 +10,7 @@
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 0.75rem 1.5rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
 
   .iplpro-header-content {
@@ -22,10 +20,8 @@
     align-items: center;
     justify-content: space-between;
     gap: 2rem;
-    flex-wrap: wrap;
   }
 
-  /* Logo & Brand */
   .iplpro-brand {
     display: flex;
     align-items: center;
@@ -36,42 +32,23 @@
     transition: all 0.3s ease;
   }
 
-  .iplpro-brand:hover {
-    transform: scale(1.05);
-  }
+  .iplpro-brand:hover { transform: scale(1.05); }
 
   .iplpro-logo {
-    width: 40px;
-    height: 40px;
+    width: 40px; height: 40px;
     background: linear-gradient(135deg, #2563eb, #1d4ed8);
     border-radius: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; font-weight: 900;
     box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
   }
 
-  .iplpro-title {
-    font-size: 1.1rem;
-    font-weight: 900;
-    letter-spacing: -0.02em;
-  }
+  .iplpro-title { font-size: 1.1rem; font-weight: 900; letter-spacing: -0.02em; }
+  .iplpro-title .highlight { color: #3b82f6; }
 
-  .iplpro-title .highlight {
-    color: #3b82f6;
-  }
+  .iplpro-nav-links { display: flex; gap: 1rem; align-items: center; }
 
-  /* Navigation Links */
-  .iplpro-nav-links {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .iplpro-nav-btn {
+  .iplpro-nav-btn, .iplpro-teams-btn, .iplpro-cart-btn {
     padding: 0.5rem 1rem;
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -82,40 +59,15 @@
     font-size: 0.85rem;
     transition: all 0.3s ease;
     text-decoration: none;
-    display: inline-block;
+    display: flex; align-items: center; gap: 0.5rem;
   }
 
-  .iplpro-nav-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
-    color: white;
-  }
-
-  .iplpro-nav-btn.active {
-    background: rgba(37, 99, 235, 0.2);
-    border-color: rgba(37, 99, 235, 0.5);
-    color: #60a5fa;
-  }
-
-  /* Teams Dropdown */
-  .iplpro-teams-btn {
-    padding: 0.5rem 1rem;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #f1f5f9;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.85rem;
-    transition: all 0.3s ease;
-    position: relative;
-  }
-
-  .iplpro-teams-btn:hover {
+  .iplpro-nav-btn:hover, .iplpro-teams-btn:hover, .iplpro-cart-btn:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.3);
   }
 
+  /* --- Teams Dropdown --- */
   .iplpro-teams-dropdown {
     position: absolute;
     top: calc(100% + 0.75rem);
@@ -126,124 +78,73 @@
     border-radius: 1rem;
     padding: 1rem;
     min-width: 400px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     display: none;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.5rem;
     z-index: 1000;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   }
 
-  .iplpro-teams-dropdown.show {
-    display: grid;
-  }
+  .iplpro-teams-dropdown.show { display: grid; }
 
   .iplpro-team-link {
-    padding: 0.75rem 1rem;
+    padding: 0.6rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #f1f5f9;
-    border-radius: 0.5rem;
+    border-radius: 0.4rem;
     text-decoration: none;
-    font-weight: 600;
-    font-size: 0.85rem;
-    transition: all 0.3s ease;
-    display: block;
-    text-align: center;
+    font-size: 0.8rem;
+    transition: 0.2s;
   }
 
-  .iplpro-team-link:hover {
-    background: rgba(37, 99, 235, 0.2);
-    border-color: rgba(37, 99, 235, 0.3);
-    color: #60a5fa;
-  }
+  .iplpro-team-link:hover { background: #2563eb; color: white; }
 
-  /* Right Section - Cart & Actions */
-  .iplpro-header-actions {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    margin-left: auto;
-  }
-
-  .iplpro-cart-btn {
-    position: relative;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #f1f5f9;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .iplpro-cart-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
-  }
-
-  .iplpro-cart-badge {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #ef4444;
+  /* --- Cart Sidebar --- */
+  .iplpro-cart-panel {
+    position: fixed;
+    right: -400px; top: 0;
+    width: 350px; height: 100%;
+    background: #0f172a;
+    z-index: 1001;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 2rem;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.5);
     color: white;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    font-weight: 900;
-    border: 2px solid #0a0a0c;
   }
 
-  .iplpro-cart-badge.hidden {
-    display: none;
-  }
+  .iplpro-cart-panel.open { right: 0; }
 
-  /* Mobile Responsive */
+  .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 1rem; }
+  
+  .iplpro-cart-badge {
+    background: #ef4444; color: white; border-radius: 50%;
+    width: 20px; height: 20px; font-size: 0.7rem;
+    display: flex; align-items: center; justify-content: center;
+    position: absolute; top: -5px; right: -5px;
+  }
+  .hidden { display: none; }
+
   @media (max-width: 768px) {
-    .iplpro-header-content {
-      gap: 0.5rem;
-    }
-
-    .iplpro-nav-links {
-      display: none;
-    }
-
-    .iplpro-teams-dropdown {
-      min-width: 300px;
-    }
-
-    .iplpro-header-actions {
-      gap: 0.75rem;
-    }
+    .iplpro-nav-links { display: none; }
+    .iplpro-teams-dropdown { min-width: 280px; }
   }
 </style>
 
 <header class="iplpro-header">
   <div class="iplpro-header-content">
-    <!-- Logo & Brand -->
     <a href="javascript:void(0)" class="iplpro-brand" onclick="navigateTo('index')">
       <div class="iplpro-logo">🏏</div>
       <div class="iplpro-title">IPL <span class="highlight">PRO</span></div>
     </a>
 
-    <!-- Navigation Links -->
     <div class="iplpro-nav-links">
-      <a href="javascript:void(0)" class="iplpro-nav-btn" id="nav-home" onclick="navigateTo('index')">Home</a>
-      <a href="javascript:void(0)" class="iplpro-nav-btn" id="nav-shop" onclick="navigateTo('home')">Shop</a>
+      <a href="javascript:void(0)" class="iplpro-nav-btn" onclick="navigateTo('index')">Home</a>
+      <a href="javascript:void(0)" class="iplpro-nav-btn" onclick="navigateTo('home')">Shop</a>
       
-      <!-- Teams Dropdown -->
       <div style="position: relative;">
-        <button class="iplpro-teams-btn" onclick="toggleTeamsMenu()" id="teams-btn">
-          🏆 Teams
-          <span style="font-size: 0.7rem; margin-left: 0.25rem;">▼</span>
+        <button class="iplpro-teams-btn" onclick="toggleTeamsMenu(event)" id="teams-btn">
+          🏆 Teams <span>▼</span>
         </button>
         <div class="iplpro-teams-dropdown" id="teams-menu">
           <a href="javascript:void(0)" class="iplpro-team-link" onclick="navigateToTeam('csk')">🦁 CSK</a>
@@ -260,65 +161,87 @@
       </div>
     </div>
 
-    <!-- Right Section - Cart -->
     <div class="iplpro-header-actions">
-      <button class="iplpro-cart-btn" onclick="openCartPanel()">
+      <button class="iplpro-cart-btn" onclick="toggleCartPanel()">
         🛒 Cart
-        <span class="iplpro-cart-badge" id="cart-count-badge">0</span>
+        <span class="iplpro-cart-badge hidden" id="cart-count-badge">0</span>
       </button>
     </div>
   </div>
 </header>
 
+<div class="iplpro-cart-panel" id="cart-panel">
+  <div class="cart-header">
+    <h3>Your Cart</h3>
+    <button onclick="toggleCartPanel()" style="background:none; border:none; color:white; cursor:pointer; font-size:1.5rem;">&times;</button>
+  </div>
+  <div id="cart-items-list" style="margin-top: 1rem;">
+    <p style="color: #94a3b8;">Your cart is empty.</p>
+  </div>
+</div>
+
 <script>
+  // --- Navigation Logic ---
   function getNavBasePath() {
-    return (window.location.pathname.includes('IPL teams') || window.location.pathname.includes('/IPL teams/')) ? '../../' : '';
+    // Correctly handles paths whether you are in root or in 'IPL teams' folder
+    return window.location.pathname.includes('/IPL teams/') ? '../' : '';
   }
 
   function navigateTo(page) {
     const base = getNavBasePath();
-    if (page === 'index') window.location.href = base + 'index.html';
-    if (page === 'home') window.location.href = base + 'home.html';
+    window.location.href = base + (page === 'index' ? 'index.html' : 'home.html');
   }
 
   function navigateToTeam(teamCode) {
     const base = getNavBasePath();
-    window.location.href = `${base}IPL teams/${teamCode}.html`;
+    // Ensures we don't double up the folder name if we are already in it
+    const folder = window.location.pathname.includes('/IPL teams/') ? '' : 'IPL teams/';
+    window.location.href = base + folder + teamCode + '.html';
   }
 
-  // Toggle Teams Dropdown
-  function toggleTeamsMenu() {
-    const menu = document.getElementById('teams-menu');
-    menu.classList.toggle('show');
+  // --- UI Toggles ---
+  function toggleTeamsMenu(e) {
+    e.stopPropagation();
+    document.getElementById('teams-menu').classList.toggle('show');
   }
 
-  // Close teams menu when clicking outside
+  function toggleCartPanel() {
+    document.getElementById('cart-panel').classList.toggle('open');
+  }
+
+  // Close menus when clicking outside
   document.addEventListener('click', function(event) {
-    const teamsBtn = document.getElementById('teams-btn');
-    const teamsMenu = document.getElementById('teams-menu');
-    if (!teamsBtn.contains(event.target) && !teamsMenu.contains(event.target)) {
-      teamsMenu.classList.remove('show');
+    const menu = document.getElementById('teams-menu');
+    const btn = document.getElementById('teams-btn');
+    if (menu && !btn.contains(event.target) && !menu.contains(event.target)) {
+      menu.classList.remove('show');
     }
   });
 
-  // Update cart count display
+  // --- Cart Functionality ---
   function updateCartCount() {
-    const cart = getCart();
-    const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-    const badge = document.getElementById('cart-count-badge');
-    if (badge) {
-      if (count > 0) {
-        badge.textContent = count;
-        badge.classList.remove('hidden');
-      } else {
-        badge.classList.add('hidden');
+    try {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      const badge = document.getElementById('cart-count-badge');
+      
+      if (badge) {
+        if (count > 0) {
+          badge.textContent = count;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
       }
+    } catch (e) {
+      console.error("Cart error:", e);
     }
   }
 
-  // Listen for cart updates
-  window.addEventListener('cartUpdated', updateCartCount);
-  
-  // Initial update
-  updateCartCount();
+  // Initial load and listeners
+  window.addEventListener('load', updateCartCount);
+  window.addEventListener('storage', updateCartCount); // Updates if changed in another tab
+  window.addEventListener('cartUpdated', updateCartCount); // For manual triggers
 </script>
+
+<div style="margin-top: 80px;"></div>
