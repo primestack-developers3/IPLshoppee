@@ -139,10 +139,19 @@ async function handlePaymentSuccess(paymentResponse, customerData) {
   btn.innerHTML = '<span class="loading-spinner"></span> Processing Order...';
 
   try {
+    // Create sequential order number and ID
+    let orderIndex = parseInt(localStorage.getItem('orderCounter') || '0', 10) || 0;
+    orderIndex += 1;
+    localStorage.setItem('orderCounter', orderIndex.toString());
+
+    const orderId = `ORDER_${orderIndex}`;
+
     // Prepare order data
     const cart = getCart();
+    const totalAmount = calculateTotal();
     const orderData = {
-      orderId: 'ORD_' + Date.now(),
+      orderId: orderId,
+      orderNumber: orderIndex,
       customer: {
         name: customerData.fullName,
         phone: customerData.phone,
@@ -153,7 +162,7 @@ async function handlePaymentSuccess(paymentResponse, customerData) {
         price: item.price,
         quantity: item.quantity || 1,
       })),
-      totalAmount: calculateTotal(),
+      totalAmount: totalAmount,
       razorpayPaymentId: paymentResponse.razorpay_payment_id || 'demo_payment_' + Date.now(),
       status: 'COMPLETED',
       createdAt: new Date().toISOString(),

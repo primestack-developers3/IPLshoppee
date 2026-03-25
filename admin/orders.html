@@ -610,11 +610,11 @@
 
             const createdAt = new Date(order.createdAt).toLocaleString('en-IN');
 
-            return `
+            return 
                 <div class="order-card">
                     <div class="order-header">
                         <div>
-                            <div class="order-id">Order #${order.id.slice(0, 8).toUpperCase()}</div>
+                            <div class="order-id">Order #${order.orderNumber || order.id || order.orderId}</div>
                             <div class="text-slate-400 text-xs mt-1">${createdAt}</div>
                         </div>
                         <span class="status-badge ${statusClass}">${order.status}</span>
@@ -654,24 +654,24 @@
                         <button class="btn btn-copy" onclick="copyOrderDetails('${order.id}')" title="Copy details for Meesho ordering">
                             📋 Copy Details
                         </button>
-                        ${order.status === 'NEW' ? `
+                        ${order.status === 'NEW' ? 
                             <button class="btn btn-ordered" onclick="updateStatus('${order.id}', 'ORDERED')">
                                 ✓ Mark Ordered
                             </button>
-                        ` : ''}
-                        ${order.status === 'ORDERED' ? `
+                         : ''}
+                        ${order.status === 'ORDERED' ? 
                             <button class="btn btn-shipped" onclick="updateStatus('${order.id}', 'SHIPPED')">
                                 🚚 Mark Shipped
                             </button>
-                        ` : ''}
-                        ${(order.status === 'NEW' || order.status === 'ORDERED') ? `
+                        : ''}
+                        ${(order.status === 'NEW' || order.status === 'ORDERED') ? 
                             <button class="btn btn-refund" onclick="openRefundModal('${order.id}')">
                                 💰 Refund
                             </button>
-                        ` : ''}
+                         : ''}
                     </div>
                 </div>
-            `;
+            ;
         }
 
         async function copyOrderDetails(orderId) {
@@ -763,5 +763,6 @@ Total: ₹${order.totalAmount}
             }, 3000);
         }
     </script>
+ <script src="checkout.js"></script>
 </body>
 </html>
