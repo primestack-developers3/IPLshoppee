@@ -164,6 +164,11 @@ async function handlePaymentSuccess(paymentResponse, customerData) {
     sessionStorage.setItem('checkoutTotal', orderData.totalAmount);
     sessionStorage.setItem('orderSuccessId', orderData.orderId);
 
+    // Store order in admin list (persistent across sessions)
+    const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
+    adminOrders.push(orderData);
+    localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
+
     // Clear cart
     localStorage.removeItem('iplCart');
     updateCartCount();

@@ -510,21 +510,29 @@
         async function loadOrders() {
             try {
                 const response = await fetch(`${API_BASE}/api/get-orders`);
-                if (!response.ok) throw new Error('Failed to load orders');
+                if (!response.ok) throw new Error('API not available');
 
                 const data = await response.json();
                 allOrders = data.orders || [];
-                renderOrders();
-                updateStats();
             } catch (error) {
-                console.error('Error loading orders:', error);
+                console.warn('API load failed; using localStorage orders:', error);
+                const localOrders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
+                allOrders = localOrders;
+            }
+
+            if (!allOrders || allOrders.length === 0) {
                 document.getElementById('ordersContainer').innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-state-icon">❌</div>
-                        <p class="text-slate-400">Failed to load orders. Please refresh the page.</p>
+                        <div class="empty-state-icon">📭</div>
+                        <p class="text-slate-400">No orders found</p>
                     </div>
                 `;
+                updateStats();
+                return;
             }
+
+            renderOrders();
+            updateStats();
         }
 
         function updateStats() {
@@ -554,6 +562,17 @@
         function renderOrders() {
             const container = document.getElementById('ordersContainer');
             let filtered = allOrders;
+
+            // Add safe fallback values for each order object
+            filtered = filtered.map(order => ({
+                id: order.orderId || order.id || 'UNKNOWN',
+                status: order.status || 'NEW',
+                customer: order.customer || { name: 'N/A', phone: 'N/A', address: 'N/A' },
+                products: order.products || [],
+                totalAmount: order.totalAmount || 0,
+                razorpayPaymentId: order.razorpayPaymentId || order.paymentId || '',
+                createdAt: order.createdAt || new Date().toISOString(),
+            }));
 
             if (currentFilter !== 'all') {
                 filtered = allOrders.filter(order => order.status === currentFilter);
