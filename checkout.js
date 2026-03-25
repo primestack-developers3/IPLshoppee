@@ -1,7 +1,8 @@
 // Checkout Form Handler
 // Handles form validation, payment initiation, and order processing
 
-const RAZORPAY_KEY = 'YOUR_RAZORPAY_KEY_ID'; // Replace with actual key
+// Update with a test Razorpay key for demo
+const RAZORPAY_KEY = 'rzp_test_1DP5MMOk9HyR63'; // Test key for demo
 const API_BASE = 'http://localhost:3000'; // Replace with actual API base
 
 function renderOrderSummary() {
@@ -92,32 +93,18 @@ async function handlePayment() {
   btn.innerHTML = '<span class="loading-spinner"></span> Processing...';
 
   try {
-    // Step 1: Create Razorpay Order
-    const orderResponse = await fetch(`${API_BASE}/api/create-order`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        amount: calculateTotal(),
-        currency: 'INR',
-      }),
-    });
+    // For now, generate a demo order ID
+    const demoOrderId = 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
-    if (!orderResponse.ok) {
-      throw new Error('Failed to create order');
-    }
-
-    const { orderId } = await orderResponse.json();
-
-    // Step 2: Open Razorpay Checkout
+    // Get customer data
     const customerData = {
       fullName: document.getElementById('fullName').value,
       phone: document.getElementById('phone').value,
       address: document.getElementById('address').value,
     };
 
-    openRazorpayCheckout(orderId, customerData);
+    // Open Razorpay Checkout directly
+    openRazorpayCheckout(demoOrderId, customerData);
 
   } catch (error) {
     console.error('Payment error:', error);
@@ -167,12 +154,13 @@ function openRazorpayCheckout(razorpayOrderId, customerData) {
 async function handlePaymentSuccess(paymentResponse, customerData) {
   const btn = document.getElementById('payNowBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="loading-spinner"></span> Saving Order...';
+  btn.innerHTML = '<span class="loading-spinner"></span> Processing Order...';
 
   try {
     // Prepare order data
     const cart = getCart();
     const orderData = {
+      orderId: 'ORD_' + Date.now(),
       customer: {
         name: customerData.fullName,
         phone: customerData.phone,
@@ -184,43 +172,29 @@ async function handlePaymentSuccess(paymentResponse, customerData) {
         quantity: item.quantity || 1,
       })),
       totalAmount: calculateTotal(),
-      razorpayOrderId: paymentResponse.razorpay_order_id,
-      razorpayPaymentId: paymentResponse.razorpay_payment_id,
-      razorpaySignature: paymentResponse.razorpay_signature,
-      status: 'NEW',
+      razorpayPaymentId: paymentResponse.razorpay_payment_id || 'demo_payment_' + Date.now(),
+      status: 'COMPLETED',
       createdAt: new Date().toISOString(),
     };
 
-    // Save order to backend
-    const saveResponse = await fetch(`${API_BASE}/api/save-order`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(orderData),
-    });
-
-    if (!saveResponse.ok) {
-      throw new Error('Failed to save order');
-    }
-
-    const result = await saveResponse.json();
+    // For demo: Save to localStorage instead of backend
+    localStorage.setItem('lastOrder', JSON.stringify(orderData));
 
     // Clear cart
     localStorage.removeItem('iplCart');
-    cart = [];
+    updateCartCount();
 
     // Show success message
     showToast('✓ Order placed successfully!', 'success');
 
-    // Redirect after brief delay
+    // Redirect to success page
     setTimeout(() => {
-      window.location.href = 'order-success.html?orderId=' + result.orderId;
-    }, 2000);
+      window.location.href = 'order-success.html?orderId=' + orderData.orderId;
+    }, 1500);
 
   } catch (error) {
-    console.error('Order save error:', error);
-    showToast('Order saved but there was an issue. Please contact support.', 'error');
+    console.error('Order processing error:', error);
+    showToast('Order completed but there was an issue. Please contact support.', 'error');
     btn.disabled = false;
     btn.innerHTML = 'Pay Now with Razorpay';
   }
@@ -241,11 +215,15 @@ function showToast(message, type = 'info') {
 
 // Initialize on page load
 window.addEventListener('DOMContentLoaded', () => {
-  // Cart should already be loaded via cart-manager.js
+  // Initialize cart from localStorage
+  const cart = getCart();
+  
+  // Render order summary
   renderOrderSummary();
 
+  // If cart is empty, redirect back to home
   if (cart.length === 0) {
-    showToast('No items in cart', 'error');
+    showToast('Your cart is empty. Redirecting to home...', 'error');
     setTimeout(() => {
       window.location.href = 'home.html';
     }, 2000);

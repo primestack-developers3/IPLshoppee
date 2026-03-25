@@ -160,6 +160,18 @@
     </style>
 </head>
 <body class="min-h-screen py-8 px-4">
+    <!-- Header Component -->
+    <div id="header-container" class="mb-8"></div>
+    <script>
+      fetch('./components/header.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('header-container').innerHTML = html;
+          initializeCart();
+          updateCartCount();
+        });
+    </script>
+
     <div class="max-w-2xl mx-auto">
 
         <!-- Header -->
