@@ -90,9 +90,14 @@ async function handlePayment() {
 
   const btn = document.getElementById('payNowBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="loading-spinner"></span> Processing...';
+  btn.innerHTML = '<span class="loading-spinner"></span> Processing Order...';
 
   try {
+    // Get customer ID from localStorage or start from 1
+    let customerId = parseInt(localStorage.getItem('customerCounter') || '0', 10) || 0;
+    customerId += 1;
+    localStorage.setItem('customerCounter', customerId.toString());
+
     // Get order ID from URL parameters (for retry scenarios) or generate demo order ID
     const urlParams = new URLSearchParams(window.location.search);
     const orderIdFromUrl = urlParams.get('orderId');
@@ -106,13 +111,13 @@ async function handlePayment() {
     };
 
     // Open Razorpay Checkout directly
-    openRazorpayCheckout(demoOrderId, customerData);
+    processDemoOrder(demoOrderId, customerData, customerId);
 
   } catch (error) {
-    console.error('Payment error:', error);
-    showToast('Payment initialization failed. Please try again.', 'error');
+    console.error('Order processing error:', error);
+    showToast('Order processing failed. Please try again.', 'error');
     btn.disabled = false;
-    btn.innerHTML = 'Pay Now with Razorpay';
+    btn.innerHTML = 'Place Demo Order';
   }
 }
 
@@ -123,19 +128,19 @@ function calculateTotal() {
   }, 0);
 }
 
-function openRazorpayCheckout(razorpayOrderId, customerData) {
-  // For demo purposes, skip Razorpay and directly process the order
+function processDemoOrder(razorpayOrderId, customerData, customerId) {
+  // For demo purposes, simulate successful payment
   const demoResponse = {
-    razorpay_payment_id: 'pay_demo_' + Date.now(),
+    razorpay_payment_id: 'DEMO_ORDER_' + Date.now(),
     razorpay_order_id: razorpayOrderId,
     razorpay_signature: 'demo_signature_' + Date.now()
   };
-  
-  // Directly process the payment as successful (no actual Razorpay call)
-  handlePaymentSuccess(demoResponse, customerData);
+
+  // Directly process the payment as successful (no actual payment)
+  handlePaymentSuccess(demoResponse, customerData, customerId);
 }
 
-async function handlePaymentSuccess(paymentResponse, customerData) {
+async function handlePaymentSuccess(paymentResponse, customerData, customerId) {
   const btn = document.getElementById('payNowBtn');
   btn.disabled = true;
   btn.innerHTML = '<span class="loading-spinner"></span> Processing Order...';
@@ -154,6 +159,7 @@ async function handlePaymentSuccess(paymentResponse, customerData) {
     const orderData = {
       orderId: orderId,
       orderNumber: orderIndex,
+      customerId: customerId,
       customer: {
         name: customerData.fullName,
         phone: customerData.phone,
@@ -165,8 +171,8 @@ async function handlePaymentSuccess(paymentResponse, customerData) {
         quantity: item.quantity || 1,
       })),
       totalAmount: totalAmount,
-      razorpayPaymentId: paymentResponse.razorpay_payment_id || 'demo_payment_' + Date.now(),
-      status: 'NEW',
+      razorpayPaymentId: paymentResponse.razorpay_payment_id || 'DEMO_ORDER_' + Date.now(),
+      status: 'DEMO', // Mark as demo order
       createdAt: new Date().toISOString(),
     };
 
