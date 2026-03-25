@@ -164,7 +164,7 @@ async function handlePaymentSuccess(paymentResponse, customerData) {
       })),
       totalAmount: totalAmount,
       razorpayPaymentId: paymentResponse.razorpay_payment_id || 'demo_payment_' + Date.now(),
-      status: 'COMPLETED',
+      status: 'NEW',
       createdAt: new Date().toISOString(),
     };
 

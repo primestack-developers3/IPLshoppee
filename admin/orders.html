@@ -566,6 +566,7 @@
             // Add safe fallback values for each order object
             filtered = filtered.map(order => ({
                 id: order.orderId || order.id || 'UNKNOWN',
+                orderNumber: order.orderNumber || order.id || order.orderId,
                 status: order.status || 'NEW',
                 customer: order.customer || { name: 'N/A', phone: 'N/A', address: 'N/A' },
                 products: order.products || [],
@@ -575,7 +576,7 @@
             }));
 
             if (currentFilter !== 'all') {
-                filtered = allOrders.filter(order => order.status === currentFilter);
+                filtered = filtered.filter(order => order.status === currentFilter);
             }
 
             if (filtered.length === 0) {
@@ -610,7 +611,7 @@
 
             const createdAt = new Date(order.createdAt).toLocaleString('en-IN');
 
-            return 
+            return `
                 <div class="order-card">
                     <div class="order-header">
                         <div>
@@ -654,24 +655,24 @@
                         <button class="btn btn-copy" onclick="copyOrderDetails('${order.id}')" title="Copy details for Meesho ordering">
                             📋 Copy Details
                         </button>
-                        ${order.status === 'NEW' ? 
+                        ${order.status === 'NEW' ? `
                             <button class="btn btn-ordered" onclick="updateStatus('${order.id}', 'ORDERED')">
                                 ✓ Mark Ordered
                             </button>
-                         : ''}
-                        ${order.status === 'ORDERED' ? 
+                        ` : ''}
+                        ${order.status === 'ORDERED' ? `
                             <button class="btn btn-shipped" onclick="updateStatus('${order.id}', 'SHIPPED')">
                                 🚚 Mark Shipped
                             </button>
-                        : ''}
-                        ${(order.status === 'NEW' || order.status === 'ORDERED') ? 
+                        ` : ''}
+                        ${(order.status === 'NEW' || order.status === 'ORDERED') ? `
                             <button class="btn btn-refund" onclick="openRefundModal('${order.id}')">
                                 💰 Refund
                             </button>
-                         : ''}
+                        ` : ''}
                     </div>
                 </div>
-            ;
+            `;
         }
 
         async function copyOrderDetails(orderId) {
