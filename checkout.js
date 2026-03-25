@@ -122,33 +122,15 @@ function calculateTotal() {
 }
 
 function openRazorpayCheckout(razorpayOrderId, customerData) {
-  const options = {
-    key: RAZORPAY_KEY,
-    amount: calculateTotal() * 100, // Razorpay expects amount in paise
-    currency: 'INR',
-    name: 'IPL PRO Fan Store',
-    description: 'Order from IPL Shoppee',
-    order_id: razorpayOrderId,
-    prefill: {
-      name: customerData.fullName,
-      contact: customerData.phone,
-    },
-    handler: async function (response) {
-      // Payment successful, save order
-      await handlePaymentSuccess(response, customerData);
-    },
-    modal: {
-      ondismiss: function () {
-        showToast('Payment cancelled', 'error');
-        const btn = document.getElementById('payNowBtn');
-        btn.disabled = false;
-        btn.innerHTML = 'Pay Now with Razorpay';
-      },
-    },
+  // For demo purposes, skip Razorpay and directly process the order
+  const demoResponse = {
+    razorpay_payment_id: 'pay_demo_' + Date.now(),
+    razorpay_order_id: razorpayOrderId,
+    razorpay_signature: 'demo_signature_' + Date.now()
   };
-
-  const rzp = new Razorpay(options);
-  rzp.open();
+  
+  // Directly process the payment as successful (no actual Razorpay call)
+  handlePaymentSuccess(demoResponse, customerData);
 }
 
 async function handlePaymentSuccess(paymentResponse, customerData) {

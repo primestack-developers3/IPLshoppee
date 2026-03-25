@@ -99,6 +99,19 @@
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center py-8 px-4">
+    <!-- Header Component -->
+    <div id="header-container" style="position: absolute; top: 0; left: 0; right: 0;"></div>
+    <script>
+      fetch('./components/header.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('header-container').innerHTML = html;
+          initializeCart();
+          updateCartCount();
+        });
+    </script>
+
+    <div style="margin-top: 80px;"></div>
     <div class="success-animation">
         <div class="success-card">
             <!-- Checkmark -->
@@ -159,10 +172,11 @@
         </div>
     </div>
 
+    <script src="cart-manager.js"></script>
     <script>
-        // Get order ID from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const orderId = urlParams.get('orderId');
+      // Get order ID from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderId = urlParams.get('orderId');
 
         if (orderId) {
             document.getElementById('orderId').textContent = orderId;

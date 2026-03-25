@@ -270,14 +270,136 @@
             border-color: rgba(37, 99, 235, 0.5);
             color: #93c5fd;
         }
+
+        .login-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .login-card {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .login-card h2 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .login-card p {
+            color: rgba(241, 245, 249, 0.6);
+            font-size: 0.875rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            color: #f1f5f9;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .login-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(37, 99, 235, 0.5);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .login-input::placeholder {
+            color: rgba(241, 245, 249, 0.3);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .login-error {
+            color: #ef4444;
+            font-size: 0.875rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            display: none;
+        }
     </style>
 </head>
 <body class="min-h-screen py-8 px-4">
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="login-modal">
+        <div class="login-card">
+            <h2>🔐 Admin Access</h2>
+            <p>Enter password to access orders dashboard</p>
+            <div class="login-error" id="loginError">Incorrect password</div>
+            <input 
+                type="password" 
+                id="adminPassword" 
+                class="login-input" 
+                placeholder="Enter admin password" 
+                onkeypress="if(event.key==='Enter') authenticateAdmin()"
+                autofocus
+            />
+            <button class="login-btn" onclick="authenticateAdmin()">🔓 Login</button>
+            <p style="color: rgba(241, 245, 249, 0.4); font-size: 0.75rem; margin-top: 1.5rem; text-align: center;">
+                Demo Password: <span style="color: rgba(241, 245, 249, 0.6); font-weight: 600;">admin123</span>
+            </p>
+        </div>
+    </div>
+    </div>
+
+    <div id="adminContent" style="display: none;">
     <div class="max-w-5xl mx-auto">
         <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-black italic tracking-tighter uppercase">Orders <span class="text-blue-500">Dashboard</span></h1>
-            <p class="text-slate-400 text-sm mt-2">Manage all customer orders and payments</p>
+        <div class="mb-8 flex justify-between items-start">
+            <div>
+                <h1 class="text-3xl font-black italic tracking-tighter uppercase">Orders <span class="text-blue-500">Dashboard</span></h1>
+                <p class="text-slate-400 text-sm mt-2">Manage all customer orders and payments</p>
+            </div>
+            <button 
+                onclick="logoutAdmin()" 
+                style="padding: 0.5rem 1rem; background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 0.5rem; cursor: pointer; font-weight: 600; font-size: 0.875rem; transition: all 0.3s ease;"
+                onmouseover="this.style.background='rgba(239, 68, 68, 0.3)'"
+                onmouseout="this.style.background='rgba(239, 68, 68, 0.2)'"
+            >
+                🔐 Logout
+            </button>
         </div>
 
         <!-- Stats -->
@@ -317,6 +439,7 @@
             </div>
         </div>
     </div>
+    </div>
 
     <!-- Toast -->
     <div id="toast" class="toast"></div>
@@ -334,13 +457,55 @@
     </div>
 
     <script>
+        // Admin password (should be hashed in production)
+        const ADMIN_PASSWORD = 'admin123';
+        let isAuthenticated = false;
+
+        // Check authentication on page load
+        function authenticateAdmin() {
+            const passwordInput = document.getElementById('adminPassword');
+            const password = passwordInput.value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (password === ADMIN_PASSWORD) {
+                isAuthenticated = true;
+                localStorage.setItem('adminAuthenticated', 'true');
+                document.getElementById('adminLoginModal').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                errorDiv.style.display = 'none';
+                loadOrders();
+            } else {
+                errorDiv.style.display = 'block';
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        }
+
+        // Check if already authenticated
+        window.addEventListener('DOMContentLoaded', function() {
+            const authenticated = localStorage.getItem('adminAuthenticated');
+            if (authenticated === 'true') {
+                isAuthenticated = true;
+                document.getElementById('adminLoginModal').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                loadOrders();
+            }
+        });
+
+        // Logout function
+        function logoutAdmin() {
+            localStorage.removeItem('adminAuthenticated');
+            isAuthenticated = false;
+            document.getElementById('adminLoginModal').style.display = 'flex';
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminPassword').focus();
+        }
+
         const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3000';
         let allOrders = [];
         let currentFilter = 'all';
         let refundingOrderId = null;
-
-        // Load orders on page load
-        window.addEventListener('DOMContentLoaded', loadOrders);
 
         async function loadOrders() {
             try {
