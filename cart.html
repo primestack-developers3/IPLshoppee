@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart | IPL PRO Fan Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="cart-manager.js"></script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #0a0a0c;
+            color: #f1f5f9;
+        }
+
+        .cart-item {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .cart-item-price {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .qty-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #60a5fa;
+            width: 32px;
+            height: 32px;
+            border-radius: 0.4rem;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+
+        .qty-btn:hover {
+            background: rgba(37, 99, 235, 0.2);
+        }
+
+        .qty-display {
+            min-width: 40px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .cart-remove {
+            background: rgba(239, 68, 68, 0.2);
+            border: none;
+            color: #ef4444;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.3rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .cart-remove:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .cart-empty {
+            text-align: center;
+            padding: 3rem;
+            color: #cbd5e1;
+        }
+
+        .cart-empty svg {
+            width: 100px;
+            height: 100px;
+            opacity: 0.3;
+            margin: 0 auto 1rem;
+        }
+
+        .cart-summary {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .cart-total {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #60a5fa;
+        }
+
+        .checkout-btn {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .checkout-btn:hover {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            transform: translateY(-2px);
+        }
+
+        .continue-shopping-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #f1f5f9;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .continue-shopping-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .clear-cart-btn {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .clear-cart-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Component -->
+    <div id="header-container"></div>
+    <script>
+      fetch('./components/header.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('header-container').innerHTML = html;
+          initializeCart();
+          updateCartCount();
+        });
+    </script>
+
+    <!-- Cart Content -->
+    <main class="pt-24 min-h-screen px-6">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl font-black mb-8">🛒 Your Cart</h1>
+
+            <div id="cart-items-container" class="space-y-4">
+                <!-- Cart items will be rendered here -->
+            </div>
+
+            <div id="cart-summary" class="cart-summary hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xl font-semibold">Total:</span>
+                    <span class="cart-total">₹<span id="cart-total-price">0</span></span>
+                </div>
+
+                <button class="continue-shopping-btn" onclick="window.history.back()">Continue Shopping</button>
+                <button class="checkout-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
+                <button class="clear-cart-btn" onclick="clearAllCart()">Clear Cart</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Render cart items
+        function renderCart() {
+            const cart = getCart();
+            const container = document.getElementById('cart-items-container');
+            const summary = document.getElementById('cart-summary');
+
+            if (!container) return;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="cart-empty">
+                        <div style="font-size: 4rem;">🛒</div>
+                        <div class="text-2xl font-semibold mb-4">Your cart is empty</div>
+                        <p class="mb-6">Add some awesome IPL gear to get started!</p>
+                        <button class="continue-shopping-btn" onclick="window.location.href='home.html'" style="width: auto; margin: 0;">Start Shopping</button>
+                    </div>
+                `;
+                summary.classList.add('hidden');
+                return;
+            }
+
+            let itemsHTML = '';
+            let total = 0;
+
+            cart.forEach(item => {
+                const itemTotal = item.price * (item.quantity || 1);
+                total += itemTotal;
+                itemsHTML += `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">₹${item.price} each</div>
+                        </div>
+                        <div class="cart-item-controls">
+                            <button class="qty-btn" onclick="updateQuantity('${item.id}', ${(item.quantity || 1) - 1})">−</button>
+                            <span class="qty-display">${item.quantity || 1}</span>
+                            <button class="qty-btn" onclick="updateQuantity('${item.id}', ${(item.quantity || 1) + 1})">+</button>
+                            <button class="cart-remove" onclick="removeFromCart('${item.id}')">Remove</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = itemsHTML;
+            summary.classList.remove('hidden');
+
+            // Update total
+            const priceEl = document.getElementById('cart-total-price');
+            if (priceEl) {
+                priceEl.textContent = total;
+            }
+        }
+
+        // Proceed to Checkout
+        function proceedToCheckout() {
+            const cart = getCart();
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            window.location.href = 'checkout.html';
+        }
+
+        // Listen for cart updates
+        window.addEventListener('cartUpdated', renderCart);
+
+        // Initial render
+        document.addEventListener('DOMContentLoaded', renderCart);
+    </script>
+
+</body>
+</html></content>
+<parameter name="filePath">c:\Users\SIDDHU\Desktop\IPLshoppee\cart.html

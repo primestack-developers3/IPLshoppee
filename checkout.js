@@ -1,10 +1,11 @@
 // Checkout Form Handler
 // Handles form validation, payment initiation, and order processing
 
-const RAZORPAY_KEY = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'YOUR_RAZORPAY_KEY_ID';
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3000';
+const RAZORPAY_KEY = 'YOUR_RAZORPAY_KEY_ID'; // Replace with actual key
+const API_BASE = 'http://localhost:3000'; // Replace with actual API base
 
 function renderOrderSummary() {
+  const cart = getCart();
   const container = document.getElementById('orderSummary');
   if (!container || cart.length === 0) return;
 
@@ -80,6 +81,7 @@ async function handlePayment() {
   }
 
   // Validate cart is not empty
+  const cart = getCart();
   if (cart.length === 0) {
     showToast('Your cart is empty', 'error');
     return;
@@ -126,6 +128,7 @@ async function handlePayment() {
 }
 
 function calculateTotal() {
+  const cart = getCart();
   return cart.reduce((total, item) => {
     return total + (item.price * (item.quantity || 1));
   }, 0);
@@ -168,6 +171,7 @@ async function handlePaymentSuccess(paymentResponse, customerData) {
 
   try {
     // Prepare order data
+    const cart = getCart();
     const orderData = {
       customer: {
         name: customerData.fullName,

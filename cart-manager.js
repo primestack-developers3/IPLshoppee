@@ -21,6 +21,8 @@ function updateCartCount() {
   const cart = getCart();
   const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
   
+  console.log('Cart count:', count, 'Cart:', cart);
+  
   // Update header badge
   const badge = document.getElementById('cart-count-badge');
   if (badge) {
@@ -47,6 +49,19 @@ function dispatchCartUpdate() {
 function initializeCart() {
   updateCartCount();
   dispatchCartUpdate();
+}
+
+// Placeholder for openCartPanel - will be overridden when cart-panel.html loads
+function openCartPanel() {
+  const panel = document.getElementById('cartPanel');
+  const overlay = document.getElementById('cartOverlay');
+  if (panel && overlay) {
+    panel.classList.add('open');
+    overlay.classList.add('show');
+    updateCartDisplay();
+  } else {
+    alert('Cart is loading... Please wait a moment.');
+  }
 }
 
 // ============================================
