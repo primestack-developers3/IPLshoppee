@@ -16,7 +16,7 @@ function renderOrderSummary() {
   cart.forEach(item => {
     const itemTotal = item.price * (item.quantity || 1);
     total += itemTotal;
-    html += `
+    html += 
       <div class="order-summary-item">
         <div class="flex-1">
           <div class="font-600">${item.name}</div>
@@ -24,7 +24,7 @@ function renderOrderSummary() {
         </div>
         <div class="font-700 text-right">₹${itemTotal}</div>
       </div>
-    `;
+    ;
   });
 
   container.innerHTML = html;
@@ -93,8 +93,10 @@ async function handlePayment() {
   btn.innerHTML = '<span class="loading-spinner"></span> Processing...';
 
   try {
-    // For now, generate a demo order ID
-    const demoOrderId = 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    // Get order ID from URL parameters (for retry scenarios) or generate demo order ID
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderIdFromUrl = urlParams.get('orderId');
+    const demoOrderId = orderIdFromUrl || 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
     // Get customer data
     const customerData = {
