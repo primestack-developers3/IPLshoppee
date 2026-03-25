@@ -159,8 +159,10 @@ async function handlePaymentSuccess(paymentResponse, customerData) {
       createdAt: new Date().toISOString(),
     };
 
-    // For demo: Save to localStorage instead of backend
+    // Save order and amount for success page visibility
     localStorage.setItem('lastOrder', JSON.stringify(orderData));
+    sessionStorage.setItem('checkoutTotal', orderData.totalAmount);
+    sessionStorage.setItem('orderSuccessId', orderData.orderId);
 
     // Clear cart
     localStorage.removeItem('iplCart');

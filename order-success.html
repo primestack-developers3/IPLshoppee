@@ -174,20 +174,41 @@
 
     <script src="cart-manager.js"></script>
     <script>
-      // Get order ID from URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const orderId = urlParams.get('orderId');
+        // Get order ID from URL or session fallback
+        const urlParams = new URLSearchParams(window.location.search);
+        let orderId = urlParams.get('orderId') || sessionStorage.getItem('orderSuccessId');
+
+        if (!orderId) {
+            const storedOrder = localStorage.getItem('lastOrder');
+            if (storedOrder) {
+                const parsed = JSON.parse(storedOrder);
+                orderId = parsed.orderId || parsed.id || 'UNKNOWN';
+            }
+        }
 
         if (orderId) {
             document.getElementById('orderId').textContent = orderId;
         }
 
-        // Get order amount from session if available
-        const totalAmount = sessionStorage.getItem('checkoutTotal');
+        // Get order amount from session or localStorage fallback
+        let totalAmount = sessionStorage.getItem('checkoutTotal');
+
+        if (!totalAmount) {
+            const storedOrder = localStorage.getItem('lastOrder');
+            if (storedOrder) {
+                totalAmount = JSON.parse(storedOrder).totalAmount;
+            }
+        }
+
         if (totalAmount) {
             document.getElementById('orderAmount').textContent = '₹' + totalAmount;
-            sessionStorage.removeItem('checkoutTotal');
+        } else {
+            document.getElementById('orderAmount').textContent = '₹0';
         }
+
+        // Clear temporary storage keys after display
+        sessionStorage.removeItem('checkoutTotal');
+        sessionStorage.removeItem('orderSuccessId');
 
         // Set timestamp
         const now = new Date();
