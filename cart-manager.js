@@ -1,17 +1,17 @@
 // ============================================
-// UNIFIED CART MANAGEMENT SYSTEM FOR IPL SHOPPEE
+// REYVAL CART MANAGEMENT SYSTEM
 // ============================================
-// This script provides persistent cart functionality across ALL pages
-// Works with header.html and cart-panel.html components
+// This script provides persistent cart functionality across all Reyval pages.
+// Works with header.html and cart-panel.html components.
 
 // Get cart from localStorage
 function getCart() {
-  return JSON.parse(localStorage.getItem('iplCart')) || [];
+  return JSON.parse(localStorage.getItem('reyvalCart')) || [];
 }
 
 // Save cart to localStorage
 function saveCart(cart) {
-  localStorage.setItem('iplCart', JSON.stringify(cart));
+  localStorage.setItem('reyvalCart', JSON.stringify(cart));
   updateCartCount();
   dispatchCartUpdate();
 }
@@ -118,7 +118,7 @@ function updateQuantity(productId, quantity) {
 // Clear entire cart
 function clearAllCart() {
   if (confirm('Are you sure you want to clear your entire cart?')) {
-    localStorage.removeItem('iplCart');
+    localStorage.removeItem('reyvalCart');
     updateCartCount();
     dispatchCartUpdate();
     const container = document.getElementById('cartItemsContainer');
@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     paymentForm.addEventListener('submit', function(e) {
       e.preventDefault();
       alert('Payment processed successfully! (This is a demo - in real implementation, this would connect to a payment gateway)');
-      localStorage.removeItem('iplCart');
+      localStorage.removeItem('reyvalCart');
       updateCartCount();
       const productsGrid = document.querySelector('.grid');
       const checkoutSection = document.getElementById('checkout');
@@ -288,5 +288,5 @@ document.addEventListener('DOMContentLoaded', () => {
 // Save cart before leaving page
 window.addEventListener('beforeunload', () => {
   const cart = getCart();
-  localStorage.setItem('iplCart', JSON.stringify(cart));
+  localStorage.setItem('reyvalCart', JSON.stringify(cart));
 });

@@ -187,7 +187,7 @@ async function handlePaymentSuccess(paymentResponse, customerData, customerId) {
     localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
 
     // Clear cart
-    localStorage.removeItem('iplCart');
+    localStorage.removeItem('reyvalCart');
     updateCartCount();
 
     // Show success message
