@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reyval Staff</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #07111d;
+            --panel: rgba(12, 22, 38, 0.9);
+            --panel-soft: rgba(255, 255, 255, 0.04);
+            --border: rgba(124, 176, 255, 0.16);
+            --accent: #8fc6ff;
+            --cream: #eef5ff;
+            --muted: rgba(238, 245, 255, 0.7);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Manrope', sans-serif;
+            color: var(--cream);
+            background:
+                radial-gradient(circle at top left, rgba(77, 160, 255, 0.18), transparent 24%),
+                radial-gradient(circle at bottom right, rgba(143, 198, 255, 0.12), transparent 20%),
+                linear-gradient(180deg, #0c1830 0%, #08111d 45%, #050a13 100%);
+        }
+
+        .shell {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 44px 20px 56px;
+        }
+
+        .hero,
+        .tool-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+        }
+
+        .hero {
+            padding: 34px;
+        }
+
+        .eyebrow {
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        h1, h2 {
+            margin: 0;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        h1 {
+            margin-top: 14px;
+            font-size: clamp(2.7rem, 5vw, 4.8rem);
+            line-height: 0.94;
+        }
+
+        p,
+        .subtle {
+            color: var(--muted);
+        }
+
+        .hero-actions,
+        .tool-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .hero-actions {
+            margin-top: 22px;
+        }
+
+        .button {
+            min-height: 50px;
+            border-radius: 16px;
+            padding: 0 18px;
+            font: inherit;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .button.primary {
+            background: linear-gradient(135deg, #dcecff 0%, #6db4ff 100%);
+            color: #07111d;
+            border: none;
+        }
+
+        .button.secondary {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--cream);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .tools {
+            margin-top: 24px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .tool-card {
+            padding: 24px;
+        }
+
+        .tool-kicker {
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .tool-card h2 {
+            margin-top: 12px;
+            font-size: 2rem;
+        }
+
+        .tool-actions {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 860px) {
+            .tools {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <section class="hero">
+            <div class="eyebrow">Staff Workspace</div>
+            <h1>Open Reyval staff tools from one separate page.</h1>
+            <p>This page is a simple staff entry point for private operational tools. Use it to open the protected orders portal and monitor customer activity without browsing the storefront.</p>
+            <div class="hero-actions">
+                <a class="button primary" href="orders.html">Open Orders Portal</a>
+                <a class="button secondary" href="home.html">Back to Home</a>
+            </div>
+        </section>
+
+        <section class="tools">
+            <article class="tool-card">
+                <div class="tool-kicker">Protected Tool</div>
+                <h2>Orders</h2>
+                <p>View every customer order in a separate password-protected portal, with pending orders shown first and repeated customer names kept as separate orders.</p>
+                <div class="tool-actions">
+                    <a class="button primary" href="orders.html">Open Orders</a>
+                </div>
+            </article>
+
+            <article class="tool-card">
+                <div class="tool-kicker">Private Access</div>
+                <h2>Staff Use Only</h2>
+                <p class="subtle">The orders portal now has its own password screen and can be locked independently from the storefront.</p>
+            </article>
+        </section>
+    </main>
+</body>
+</html>

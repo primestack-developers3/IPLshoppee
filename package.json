@@ -1,0 +1,16 @@
+{
+  "name": "reyval-storefront",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "sync:catalog": "node scripts/sync-reyval-catalog.mjs",
+    "sync:firebase-products": "node scripts/sync-reyval-firebase-catalog.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0"
+  }
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reyval | Accessories</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles/reyval-storefront.css">
+    <script src="./cart-manager.js"></script>
+    <script src="./data/reyval-catalog.js"></script>
+    <script src="./scripts/reyval-storefront.js"></script>
+</head>
+<body>
+    <div id="header-container"></div>
+    <div id="cart-panel-container"></div>
+
+    <main class="page-shell">
+        <div class="container">
+            <section class="hero">
+                <div class="eyebrow">Reyval Accessories</div>
+                <h1 class="hero-title" id="hero-category-title">Accessories Collection</h1>
+                <p class="hero-copy" id="hero-category-copy"></p>
+                <div class="hero-actions">
+                    <a class="hero-button" href="home.html">Back to Home</a>
+                    <a class="secondary-button" href="search.html">Search Products</a>
+                    <a class="secondary-button" href="cart.html">View Your Bag</a>
+                </div>
+                <nav id="category-nav" class="category-nav category-nav-spaced" aria-label="Product categories"></nav>
+            </section>
+
+            <section class="section-block">
+                <div class="section-header">
+                    <div>
+                        <div class="section-kicker" id="category-count"></div>
+                        <h2 class="section-title" id="section-category-title">Accessories</h2>
+                    </div>
+                    <p class="section-copy" id="section-category-copy"></p>
+                </div>
+                <div id="category-grid" class="product-grid"></div>
+                <div class="source-panel" id="source-panel"></div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        ReyvalStorefront.hydrateChrome();
+        ReyvalStorefront.renderCategoryPage('accessories');
+    </script>
+</body>
+</html>

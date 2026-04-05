@@ -1,237 +1,347 @@
-// Checkout Form Handler
-// Handles form validation, payment initiation, and order processing
+const API_BASE = (window.REYVAL_API_BASE || '').replace(/\/$/, '');
 
-// Update with a test Razorpay key for demo
-const RAZORPAY_KEY = 'rzp_test_1DP5MMOk9HyR63'; // Test key for demo
-const API_BASE = 'http://localhost:3000'; // Replace with actual API base
+let paymentConfig = {
+  paymentMode: 'manual',
+  hasRealPayment: false,
+  razorpayKeyId: ''
+};
 
-function renderOrderSummary() {
-  const cart = getCart();
-  const container = document.getElementById('orderSummary');
-  if (!container || cart.length === 0) return;
+function resolveApiUrl(path) {
+  if (API_BASE) {
+    return `${API_BASE}${path}`;
+  }
+  return path;
+}
 
-  let total = 0;
-  let html = '';
-
-  cart.forEach(item => {
-    const itemTotal = item.price * (item.quantity || 1);
-    total += itemTotal;
-    html += 
-      <div class="order-summary-item">
-        <div class="flex-1">
-          <div class="font-600">${item.name}</div>
-          <div class="text-slate-400 text-sm">₹${item.price} × ${item.quantity || 1}</div>
-        </div>
-        <div class="font-700 text-right">₹${itemTotal}</div>
-      </div>
-    ;
+async function apiRequest(path, options = {}) {
+  const response = await fetch(resolveApiUrl(path), {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    },
+    ...options
   });
 
-  container.innerHTML = html;
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || `Request failed with status ${response.status}`);
+  }
 
-  // Update total
+  return response.json();
+}
+
+function getCheckoutCart() {
+  if (typeof getCart === 'function') {
+    return getCart();
+  }
+  return JSON.parse(localStorage.getItem('reyvalCart') || '[]');
+}
+
+function renderOrderSummary() {
+  const cart = getCheckoutCart();
+  const container = document.getElementById('orderSummary');
+  if (!container) return;
+
+  if (!cart.length) {
+    container.innerHTML = '<p class="text-slate-400">Your bag is empty.</p>';
+    const totalAmountEl = document.getElementById('totalAmount');
+    if (totalAmountEl) totalAmountEl.textContent = '0';
+    return;
+  }
+
+  const products = ReyvalOrderTools.hydrateCart(cart);
+  const total = products.reduce((sum, item) => sum + item.lineRevenue, 0);
+
+  container.innerHTML = products.map(item => `
+    <div class="order-summary-item">
+      <div class="flex-1">
+        <div class="font-semibold">${item.name}</div>
+        <div class="text-slate-400 text-sm">${ReyvalOrderTools.formatCurrency(item.saleUnitPrice)} x ${item.quantity}</div>
+      </div>
+      <div class="font-bold text-right">${ReyvalOrderTools.formatCurrency(item.lineRevenue)}</div>
+    </div>
+  `).join('');
+
   const totalAmountEl = document.getElementById('totalAmount');
   if (totalAmountEl) {
-    totalAmountEl.textContent = total;
+    totalAmountEl.textContent = String(total);
   }
 }
 
 function validateCheckoutForm() {
-  const form = document.getElementById('checkoutForm');
   const fullName = document.getElementById('fullName');
   const phone = document.getElementById('phone');
+  const email = document.getElementById('email');
   const address = document.getElementById('address');
+  const pincode = document.getElementById('pincode');
 
   let isValid = true;
 
-  // Clear previous errors
   document.querySelectorAll('.form-group').forEach(group => {
     group.classList.remove('error');
   });
 
-  // Validate full name
   if (!fullName.value.trim()) {
     fullName.parentElement.classList.add('error');
     isValid = false;
   }
 
-  // Validate phone (10 digits)
-  const phoneRegex = /^\d{10}$/;
-  if (!phoneRegex.test(phone.value.replace(/\D/g, ''))) {
+  if (!/^\d{10}$/.test(phone.value.replace(/\D/g, ''))) {
     phone.parentElement.classList.add('error');
     isValid = false;
   }
 
-  // Validate address
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+    email.parentElement.classList.add('error');
+    isValid = false;
+  }
+
   if (!address.value.trim()) {
     address.parentElement.classList.add('error');
     isValid = false;
   }
 
+  if (!/^\d{6}$/.test(pincode.value.replace(/\D/g, ''))) {
+    pincode.parentElement.classList.add('error');
+    isValid = false;
+  }
+
   if (!isValid) {
-    showToast('Please fill all fields correctly', 'error');
+    showToast('Please fill all fields correctly.', 'error');
   }
 
   return isValid;
 }
 
+function getCustomerData() {
+  return {
+    fullName: document.getElementById('fullName').value.trim(),
+    phone: document.getElementById('phone').value.replace(/\D/g, ''),
+    email: document.getElementById('email').value.trim(),
+    address: document.getElementById('address').value.trim(),
+    pincode: document.getElementById('pincode').value.replace(/\D/g, '')
+  };
+}
+
+function setButtonLoading(isLoading, label = 'Place Order') {
+  const button = document.getElementById('payNowBtn');
+  if (!button) return;
+
+  button.disabled = isLoading;
+  button.innerHTML = isLoading
+    ? '<span class="loading-spinner"></span> Processing...'
+    : label;
+}
+
+function updateCheckoutModeUi() {
+  const modePanel = document.getElementById('paymentModePanel');
+  const modeLabel = document.getElementById('paymentModeLabel');
+  const button = document.getElementById('payNowBtn');
+
+  const usingRazorpay = paymentConfig.paymentMode === 'razorpay' && paymentConfig.hasRealPayment;
+
+  if (modeLabel) {
+    modeLabel.textContent = usingRazorpay
+      ? 'Secure payment is enabled through Razorpay.'
+      : 'Payment API is not configured, so orders will be captured for manual follow-up.';
+  }
+
+  if (modePanel) {
+    modePanel.innerHTML = usingRazorpay
+      ? `
+        <p class="text-sm"><strong>Payment mode:</strong> Razorpay checkout is ready.</p>
+        <p class="text-sm mt-2">Once payment is successful, the order will be logged with sourcing details for Meesho follow-up.</p>
+      `
+      : `
+        <p class="text-sm"><strong>Order mode:</strong> Your customer details and cart will still be captured properly.</p>
+        <p class="text-sm mt-2">Use the admin orders dashboard to see what customers bought, expected source cost, and which Meesho link to open next.</p>
+      `;
+  }
+
+  if (button) {
+    button.textContent = usingRazorpay ? 'Pay Securely' : 'Place Order';
+  }
+}
+
+async function loadPaymentConfig() {
+  try {
+    paymentConfig = await apiRequest('/api/config');
+  } catch (error) {
+    paymentConfig = {
+      paymentMode: 'manual',
+      hasRealPayment: false,
+      razorpayKeyId: ''
+    };
+  }
+
+  updateCheckoutModeUi();
+}
+
+async function createOrderRecord(customer, cart, payment) {
+  try {
+    const response = await apiRequest('/api/orders', {
+      method: 'POST',
+      body: JSON.stringify({ customer, cart, payment })
+    });
+
+    const order = response.order;
+    ReyvalOrderTools.mirrorOrder(order);
+    return order;
+  } catch (error) {
+    const order = ReyvalOrderTools.buildLocalOrder({
+      customer,
+      cart,
+      payment,
+      source: 'browser-local'
+    });
+    ReyvalOrderTools.persistLocalOrder(order);
+    return order;
+  }
+}
+
+function completeCheckout(order, successMessage = 'Order placed successfully.') {
+  localStorage.removeItem('reyvalCart');
+  if (typeof updateCartCount === 'function') {
+    updateCartCount();
+  }
+
+  showToast(successMessage, 'success');
+
+  setTimeout(() => {
+    window.location.href = `order-success.html?orderId=${encodeURIComponent(order.orderId)}`;
+  }, 900);
+}
+
+async function finalizeOrder(customer, cart, payment) {
+  const order = await createOrderRecord(customer, cart, payment);
+  completeCheckout(order);
+}
+
+async function launchRazorpayCheckout(customer, cart) {
+  const payload = await apiRequest('/api/payments/create-order', {
+    method: 'POST',
+    body: JSON.stringify({ customer, cart })
+  });
+
+  if (payload.paymentMode !== 'razorpay' || !payload.order?.id) {
+    await finalizeOrder(customer, cart, {
+      mode: 'manual',
+      provider: 'manual',
+      status: 'pending_manual_review'
+    });
+    return;
+  }
+
+  const options = {
+    key: payload.razorpayKeyId,
+    amount: payload.order.amount,
+    currency: payload.order.currency,
+    name: 'Reyval',
+    description: 'Luxury checkout',
+    order_id: payload.order.id,
+    prefill: {
+      name: customer.fullName,
+      contact: customer.phone,
+      email: customer.email
+    },
+    theme: {
+      color: '#d4af37'
+    },
+    handler: async response => {
+      try {
+        const verification = await apiRequest('/api/payments/verify', {
+          method: 'POST',
+          body: JSON.stringify(response)
+        });
+
+        if (!verification.order) {
+          throw new Error('Verified payment did not return an order record.');
+        }
+
+        ReyvalOrderTools.mirrorOrder(verification.order);
+        completeCheckout(verification.order, 'Payment received. Order placed successfully.');
+      } catch (error) {
+        console.error('Payment verification failed:', error);
+        showToast('Payment verification failed. Please contact support.', 'error');
+        setButtonLoading(false, 'Pay Securely');
+      }
+    },
+    modal: {
+      ondismiss: () => {
+        setButtonLoading(false, 'Pay Securely');
+      }
+    }
+  };
+
+  const razorpay = new Razorpay(options);
+  razorpay.open();
+}
+
 async function handlePayment() {
-  // Validate form first
   if (!validateCheckoutForm()) {
     return;
   }
 
-  // Validate cart is not empty
-  const cart = getCart();
-  if (cart.length === 0) {
-    showToast('Your cart is empty', 'error');
+  const cart = getCheckoutCart();
+  if (!cart.length) {
+    showToast('Your cart is empty.', 'error');
     return;
   }
 
-  const btn = document.getElementById('payNowBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="loading-spinner"></span> Processing Order...';
+  const customer = getCustomerData();
+  const usingRazorpay = paymentConfig.paymentMode === 'razorpay' && paymentConfig.hasRealPayment && typeof Razorpay !== 'undefined';
+
+  setButtonLoading(true, usingRazorpay ? 'Pay Securely' : 'Place Order');
 
   try {
-    // Get customer ID from localStorage or start from 1
-    let customerId = parseInt(localStorage.getItem('customerCounter') || '0', 10) || 0;
-    customerId += 1;
-    localStorage.setItem('customerCounter', customerId.toString());
+    if (usingRazorpay) {
+      await launchRazorpayCheckout(customer, cart);
+      return;
+    }
 
-    // Get order ID from URL parameters (for retry scenarios) or generate demo order ID
-    const urlParams = new URLSearchParams(window.location.search);
-    const orderIdFromUrl = urlParams.get('orderId');
-    const demoOrderId = orderIdFromUrl || 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-
-    // Get customer data
-    const customerData = {
-      fullName: document.getElementById('fullName').value,
-      phone: document.getElementById('phone').value,
-      address: document.getElementById('address').value,
-    };
-
-    // Open Razorpay Checkout directly
-    processDemoOrder(demoOrderId, customerData, customerId);
-
+    await finalizeOrder(customer, cart, {
+      mode: 'manual',
+      provider: 'manual',
+      status: 'pending_manual_review'
+    });
   } catch (error) {
-    console.error('Order processing error:', error);
-    showToast('Order processing failed. Please try again.', 'error');
-    btn.disabled = false;
-    btn.innerHTML = 'Place Demo Order';
-  }
-}
-
-function calculateTotal() {
-  const cart = getCart();
-  return cart.reduce((total, item) => {
-    return total + (item.price * (item.quantity || 1));
-  }, 0);
-}
-
-function processDemoOrder(razorpayOrderId, customerData, customerId) {
-  // For demo purposes, simulate successful payment
-  const demoResponse = {
-    razorpay_payment_id: 'DEMO_ORDER_' + Date.now(),
-    razorpay_order_id: razorpayOrderId,
-    razorpay_signature: 'demo_signature_' + Date.now()
-  };
-
-  // Directly process the payment as successful (no actual payment)
-  handlePaymentSuccess(demoResponse, customerData, customerId);
-}
-
-async function handlePaymentSuccess(paymentResponse, customerData, customerId) {
-  const btn = document.getElementById('payNowBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="loading-spinner"></span> Processing Order...';
-
-  try {
-    // Create sequential order number and ID
-    let orderIndex = parseInt(localStorage.getItem('orderCounter') || '0', 10) || 0;
-    orderIndex += 1;
-    localStorage.setItem('orderCounter', orderIndex.toString());
-
-    const orderId = `ORDER_${orderIndex}`;
-
-    // Prepare order data
-    const cart = getCart();
-    const totalAmount = calculateTotal();
-    const orderData = {
-      orderId: orderId,
-      orderNumber: orderIndex,
-      customerId: customerId,
-      customer: {
-        name: customerData.fullName,
-        phone: customerData.phone,
-        address: customerData.address,
-      },
-      products: cart.map(item => ({
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity || 1,
-      })),
-      totalAmount: totalAmount,
-      razorpayPaymentId: paymentResponse.razorpay_payment_id || 'DEMO_ORDER_' + Date.now(),
-      status: 'DEMO', // Mark as demo order
-      createdAt: new Date().toISOString(),
-    };
-
-    // Save order and amount for success page visibility
-    localStorage.setItem('lastOrder', JSON.stringify(orderData));
-    sessionStorage.setItem('checkoutTotal', orderData.totalAmount);
-    sessionStorage.setItem('orderSuccessId', orderData.orderId);
-
-    // Store order in admin list (persistent across sessions)
-    const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
-    adminOrders.push(orderData);
-    localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
-
-    // Clear cart
-    localStorage.removeItem('reyvalCart');
-    updateCartCount();
-
-    // Show success message
-    showToast('✓ Order placed successfully!', 'success');
-
-    // Redirect to success page
-    setTimeout(() => {
-      window.location.href = 'order-success.html?orderId=' + orderData.orderId;
-    }, 1500);
-
-  } catch (error) {
-    console.error('Order processing error:', error);
-    showToast('Order completed but there was an issue. Please contact support.', 'error');
-    btn.disabled = false;
-    btn.innerHTML = 'Pay Now with Razorpay';
+    console.error('Checkout failed:', error);
+    showToast('Checkout failed. Please try again.', 'error');
+    setButtonLoading(false, usingRazorpay ? 'Pay Securely' : 'Place Order');
   }
 }
 
 function goBackToCart() {
-  window.history.back();
+  window.location.href = 'cart.html';
 }
 
 function showToast(message, type = 'info') {
   const toast = document.getElementById('toast');
+  if (!toast) return;
+
   toast.textContent = message;
   toast.className = `toast show ${type}`;
+
   setTimeout(() => {
     toast.classList.remove('show');
-  }, 3000);
+  }, 3200);
 }
 
-// Initialize on page load
-window.addEventListener('DOMContentLoaded', () => {
-  // Initialize cart from localStorage
-  const cart = getCart();
-  
-  // Render order summary
+window.handlePayment = handlePayment;
+window.goBackToCart = goBackToCart;
+window.renderOrderSummary = renderOrderSummary;
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const cart = getCheckoutCart();
   renderOrderSummary();
 
-  // If cart is empty, redirect back to home
-  if (cart.length === 0) {
-    showToast('Your cart is empty. Redirecting to home...', 'error');
+  if (!cart.length) {
+    showToast('Your cart is empty. Redirecting home...', 'error');
     setTimeout(() => {
       window.location.href = 'home.html';
-    }, 2000);
+    }, 1600);
+    return;
   }
+
+  await loadPaymentConfig();
 });

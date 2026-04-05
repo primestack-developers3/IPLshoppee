@@ -3,389 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-site-verification" content="6SaLofNa9pbyuBO3HUbdR1Cl2OVT5sYYFptJ5D-DjAM" />
-    <title>Reyval | Online Luxury Fashion</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <meta name="google-site-verification" content="6SaLofNa9pbyuBO3HUbdR1Cl2OVT5sYYFptJ5D-DjAM">
+    <title>Reyval | Luxury Collections</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles/reyval-storefront.css">
     <script src="./cart-manager.js"></script>
-    <style>
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-            background-color: #0F3D2E;
-            color: #F5F5DC;
-        }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .view-section {
-            display: none;
-            animation: fadeIn 0.45s ease-out;
-        }
-        .view-section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .hero-gradient {
-            background: radial-gradient(circle at top right, rgba(212, 175, 55, 0.16), transparent 48%),
-                        radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.08), transparent 42%);
-        }
-
-        .section-card {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(245, 245, 220, 0.08);
-            border-radius: 2rem;
-            box-shadow: 0 40px 120px rgba(0, 0, 0, 0.16);
-        }
-
-        .accent-btn {
-            background: linear-gradient(135deg, #D4AF37 0%, #B88F28 100%);
-            color: #0F3D2E;
-            font-weight: 800;
-        }
-
-        .accent-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 45px rgba(212, 175, 55, 0.25);
-        }
-
-        .card-hover {
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-
-        .card-hover:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 35px 65px rgba(0, 0, 0, 0.2);
-        }
-
-        .toast-notification {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: rgba(212, 175, 55, 0.95);
-            color: #0F3D2E;
-            padding: 1rem 1.5rem;
-            border-radius: 1rem;
-            font-weight: 800;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-            transform: translateY(100px);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 1000;
-        }
-        .toast-notification.show {
-            transform: translateY(0);
-        }
-    </style>
+    <script src="./data/reyval-catalog.js"></script>
+    <script src="./scripts/reyval-storefront.js"></script>
 </head>
-<body class="selection:bg-blue-500/30">
-
-    <!-- Header Component -->
+<body>
     <div id="header-container"></div>
-    <script>
-      fetch('./components/header.html')
-        .then(response => response.text())
-        .then(html => {
-          document.getElementById('header-container').innerHTML = html;
-          // Initialize cart count after header loads
-          initializeCart();
-          updateCartCount();
-        });
-    </script>
-
-    <!-- Cart Panel Component -->
     <div id="cart-panel-container"></div>
-    <script>
-      fetch('./components/cart-panel.html')
-        .then(response => response.text())
-        .then(html => document.getElementById('cart-panel-container').innerHTML = html);
-    </script>
 
-    <!-- VIEWS -->
-    <main class="pt-24 min-h-[80vh]">
-        <!-- [Home, Shop, Cart, Policy sections same as before] -->
-        <section id="view-home" class="view-section active">
-            <div class="px-6 mb-16">
-                <div class="max-w-7xl mx-auto relative rounded-[3rem] overflow-hidden section-card p-12 md:p-24 hero-gradient">
-                    <div class="relative z-10 max-w-2xl space-y-10">
-                        <div class="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/10 text-[#F5F5DC] text-[11px] font-black tracking-[0.3em] uppercase">
-                            <span class="animate-pulse">✧</span> Reyval Collection
-                        </div>
-                        <h1 class="text-6xl md:text-8xl font-black tracking-tight uppercase leading-tight" style="line-height:0.95;">
-                            Reyval
-                            <br />
-                            The House of Modern<br />
-                            Regal Fashion.
-                        </h1>
-                        <p class="text-[#F5F5DC]/80 text-lg md:text-xl font-medium max-w-xl leading-relaxed">
-                            A premium luxury fashion experience shaped with elegant silhouettes, quiet power and luminous details.
-                        </p>
-                        <div class="flex flex-wrap gap-4 pt-4">
-                            <button onclick="showView('shop')" class="accent-btn px-10 py-4 rounded-3xl text-sm tracking-[0.15em] uppercase shadow-lg transition-transform">
-                                Explore Collection
-                            </button>
-                            <a href="cart.html" class="border border-[#D4AF37]/60 text-[#F5F5DC] px-10 py-4 rounded-3xl hover:bg-[#D4AF37]/10 transition-colors uppercase text-sm tracking-[0.15em]">
-                                Your Bag
-                            </a>
-                        </div>
+    <main class="page-shell">
+        <div class="container">
+            <section class="hero">
+                <div class="eyebrow">Reyval Luxury Edit</div>
+                <h1 class="hero-title">Modern royalty, reimagined for men, women, children and statement accessories.</h1>
+                <p class="hero-copy">
+                    Discover a refined Reyval storefront with editorial product cards, polished descriptions,
+                    premium visuals, and dedicated collection pages for every category.
+                </p>
+                <div class="hero-actions">
+                    <a class="hero-button" href="#collections">Explore Collections</a>
+                    <a class="secondary-button" href="search.html">Search Products</a>
+                    <a class="secondary-button" href="cart.html">View Your Bag</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <span class="stat-label">Collections</span>
+                        <span class="stat-value" id="stat-categories">4</span>
                     </div>
-                    <div class="absolute inset-y-0 right-0 w-full md:w-1/2 pointer-events-none opacity-20">
-                        <div class="h-full bg-[radial-gradient(circle_at_top_right,_rgba(212,175,55,0.3),_transparent_60%)]"></div>
+                    <div class="stat-card">
+                        <span class="stat-label">Products Loaded</span>
+                        <span class="stat-value" id="stat-products">40</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Reyval Experience</span>
+                        <span class="stat-value">Premium Design</span>
                     </div>
                 </div>
-            </div>
-            <div class="px-6 mb-24 max-w-7xl mx-auto">
-                <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            </section>
+
+            <section id="collections" class="section-block">
+                <div class="section-header">
                     <div>
-                        <h2 class="text-4xl font-black italic tracking-tighter uppercase">Featured Atelier</h2>
-                        <p class="text-[#F5F5DC]/70 mt-2 max-w-2xl">Quiet luxury, crafted details and statement essentials designed for the modern wardrobe.</p>
+                        <div class="section-kicker">Dedicated Pages</div>
+                        <h2 class="section-title">Explore by Collection</h2>
                     </div>
-                    <button onclick="showView('shop')" class="accent-btn px-8 py-3 rounded-full uppercase tracking-[0.2em] text-xs">Shop the Edit</button>
+                    <p class="section-copy">
+                        Each Reyval category now has its own page so shoppers can browse men, women, children,
+                        and accessories in a focused luxury layout.
+                    </p>
                 </div>
-                <div id="trending-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10"></div>
-            </div>
-        </section>
+                <div id="home-category-links" class="link-grid"></div>
+            </section>
 
-        <!-- Dynamic Shop Section -->
-        <section id="view-shop" class="view-section">
-            <div class="max-w-7xl mx-auto px-6">
-                <div id="category-filter" class="flex overflow-x-auto gap-4 pb-8 no-scrollbar"></div>
-                <div id="shop-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20"></div>
-            </div>
-        </section>
-
-        <!-- Cart and Policy containers -->
-        <section id="view-cart" class="view-section">
-            <div class="max-w-4xl mx-auto px-6 py-10" id="cart-container">
-                <h2 class="text-4xl font-black italic mb-8 uppercase">Shopping Bag</h2>
-                <div id="cart-items" class="space-y-6"></div>
-                <div id="cart-empty" class="hidden text-center py-20 bg-white/5 rounded-[3rem] border border-dashed border-white/10">
-                    <p class="text-slate-500 font-bold uppercase">Your bag is empty</p>
+            <section class="section-block" id="staff-access">
+                <div class="section-header">
+                    <div>
+                        <div class="section-kicker">Staff Access</div>
+                        <h2 class="section-title">Private Reyval Tools</h2>
+                    </div>
+                    <p class="section-copy">
+                        Open the separate staff page to reach the protected orders portal and monitor customer orders away from the storefront.
+                    </p>
                 </div>
-                <div id="cart-summary" class="hidden mt-10 space-y-8">
-                    <!-- Order Summary -->
-                    <div class="bg-white/5 border border-white/10 p-8 rounded-[2.5rem]">
-                        <h3 class="text-2xl font-bold mb-6">Order Summary</h3>
-                        <div id="order-items-summary" class="space-y-3 mb-6"></div>
-                        <div class="border-t border-white/10 pt-4">
-                            <div class="flex justify-between text-xl font-bold">
-                                <span>Total (incl. GST):</span>
-                                <span id="total-price">₹0</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Payment Form -->
-                    <div class="bg-white/5 border border-white/10 p-8 rounded-[2.5rem]">
-                        <h3 class="text-2xl font-bold mb-6">Payment Details</h3>
-                        <form id="payment-form" action="#" method="post">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium mb-2">Card Number</label>
-                                    <input type="text" placeholder="1234 5678 9012 3456" class="w-full p-4 bg-slate-800 border border-slate-600 rounded-xl focus:border-blue-500 focus:outline-none text-white placeholder-slate-400" required>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-2">Expiry Date</label>
-                                    <input type="text" placeholder="MM/YY" class="w-full p-4 bg-slate-800 border border-slate-600 rounded-xl focus:border-blue-500 focus:outline-none text-white placeholder-slate-400" required>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-2">CVV</label>
-                                    <input type="text" placeholder="123" class="w-full p-4 bg-slate-800 border border-slate-600 rounded-xl focus:border-blue-500 focus:outline-none text-white placeholder-slate-400" required>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium mb-2">Cardholder Name</label>
-                                    <input type="text" placeholder="John Doe" class="w-full p-4 bg-slate-800 border border-slate-600 rounded-xl focus:border-blue-500 focus:outline-none text-white placeholder-slate-400" required>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium mb-2">Billing Address</label>
-                                    <textarea placeholder="Enter your billing address" rows="3" class="w-full p-4 bg-slate-800 border border-slate-600 rounded-xl focus:border-blue-500 focus:outline-none text-white placeholder-slate-400" required></textarea>
-                                </div>
-                            </div>
-                            <button type="submit" class="w-full mt-6 bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-colors">Complete Payment</button>
-                        </form>
-                    </div>
+                <div class="hero-actions" style="justify-content: center; margin-top: 0;">
+                    <a class="hero-button" href="staff.html">Staff</a>
                 </div>
-            </div>
-        </section>
-
-        <section id="view-policy" class="view-section">
-            <div class="max-w-4xl mx-auto px-6 py-12">
-                <div class="bg-white/5 border border-white/10 p-12 rounded-[3rem] space-y-8" id="policy-content"></div>
-            </div>
-        </section>
-    </main>
-
-    <div id="toast" class="toast-notification">Added to Bag! 🛍️</div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-        // Firebase Initialization
-        const firebaseConfig = {
-          apiKey: "AIzaSyDGZQUXhcEOrdVw8jc2QFnnNm9b-o1BGnc",
-          authDomain: "ipl-fanbase-shopee.firebaseapp.com",
-          projectId: "ipl-fanbase-shopee",
-          storageBucket: "ipl-fanbase-shopee.firebasestorage.app",
-          messagingSenderId: "174418005921",
-          appId: "1:174418005921:web:21a22cc6712c0ab78585e0",
-          measurementId: "G-XPXDF4KW7N"
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-
-        // State & Data
-        let activeCategory = 'women';
-        const availableCategory = new URLSearchParams(window.location.search).get('category');
-        const CATEGORIES = [
-            { id: 'men', name: 'Men', emoji: '👔' },
-            { id: 'women', name: 'Women', emoji: '👗' },
-            { id: 'kids', name: 'Kids', emoji: '🧒' },
-            { id: 'accessories', name: 'Accessories', emoji: '👜' }
-        ];
-
-        if (availableCategory && CATEGORIES.some(c => c.id === availableCategory)) {
-            activeCategory = availableCategory;
-        }
-
-        const PRODUCTS = [
-            { id: 'mens-denim-jacket', name: 'Denim Jacket', category: 'men', price: 2699, img: '🧥', label: 'Layer up in style' },
-            { id: 'classic-oxford-shirt', name: 'Oxford Shirt', category: 'men', price: 1899, img: '👔', label: 'Smart-casual comfort' },
-            { id: 'slim-fit-chinos', name: 'Slim Fit Chinos', category: 'men', price: 1599, img: '🩳', label: 'Everyday essential' },
-            { id: 'women-silk-top', name: 'Silk Top', category: 'women', price: 2199, img: '👚', label: 'Soft, premium drape' },
-            { id: 'women-maxi-dress', name: 'Maxi Dress', category: 'women', price: 2499, img: '👗', label: 'All-day elegance' },
-            { id: 'women-knit-cardigan', name: 'Knit Cardigan', category: 'women', price: 1999, img: '🧶', label: 'Cozy style for layers' },
-            { id: 'kids-graphic-tee', name: 'Graphic Tee', category: 'kids', price: 899, img: '👕', label: 'Fun and comfy' },
-            { id: 'kids-sweatpants', name: 'Sweatpants', category: 'kids', price: 1099, img: '👖', label: 'Play-ready comfort' },
-            { id: 'kids-denim-jacket', name: 'Denim Jacket', category: 'kids', price: 1499, img: '🧥', label: 'Mini styling made easy' },
-            { id: 'fashion-backpack', name: 'Fashion Backpack', category: 'accessories', price: 1799, img: '🎒', label: 'Wearable storage' },
-            { id: 'leather-belt', name: 'Leather Belt', category: 'accessories', price: 699, img: '🧵', label: 'Finishing touch' },
-            { id: 'sunny-sunglasses', name: 'Sunglasses', category: 'accessories', price: 1299, img: '🕶️', label: 'Shades for every look' }
-        ];
-
-        const TRENDING = [
-            { id: 'trending-1', name: 'Relaxed Linen Shirt', category: 'men', price: 1499, img: '👕', sales: '9.2k+' },
-            { id: 'trending-2', name: 'Chic Midi Dress', category: 'women', price: 2299, img: '👗', sales: '7.8k+' },
-            { id: 'trending-3', name: 'Kids Adventure Set', category: 'kids', price: 1899, img: '🧒', sales: '6.4k+' },
-            { id: 'trending-4', name: 'Leather Tote Bag', category: 'accessories', price: 1799, img: '👜', sales: '8.1k+' }
-        ];
-
-        const cartManagerAddToCart = window.addToCart;
-
-        // Auth Guardian
-        const initAuth = async () => {
-            if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) {
-                await signInWithCustomToken(auth, window.__initial_auth_token);
-            }
-        };
-        initAuth();
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('user-name').innerText = user.displayName || 'Style Shopper';
-                const avatar = document.getElementById('user-avatar');
-                if (user.photoURL) {
-                    avatar.innerHTML = `<img src="${user.photoURL}" class="w-full h-full object-cover">`;
-                } else {
-                    avatar.innerText = (user.displayName || 'F').charAt(0).toUpperCase();
-                }
-            } else {
-                window.location.href = 'index.html';
-            }
-        });
-
-        window.handleLogout = async () => {
-            await signOut(auth);
-            window.location.href = 'index.html';
-        };
-
-        // Logic (Exposed to global window for HTML onclicks)
-        window.showView = (viewId) => {
-            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-            document.getElementById(`view-${viewId}`).classList.add('active');
-            if (viewId === 'shop') renderShop();
-            if (viewId === 'cart') renderCart();
-            if (viewId === 'home') renderHome();
-        };
-
-        const renderHome = () => {
-            const grid = document.getElementById('trending-grid');
-            grid.innerHTML = TRENDING.map(p => `
-                <div class="bg-white/5 border border-white/5 rounded-[2.5rem] p-8 text-center group">
-                    <div class="text-7xl mb-6 group-hover:scale-110 transition-transform">${p.img}</div>
-                    <p class="text-[10px] font-black text-slate-500 uppercase">${p.sales} bought</p>
-                    <h3 class="text-xl font-bold">${p.name}</h3>
-                    <div class="flex items-center justify-between mt-6">
-                        <span class="text-2xl font-black">₹${p.price}</span>
-                        <button onclick="addItemToBag('${p.id}')" class="w-10 h-10 bg-white text-black rounded-xl font-bold">+</button>
-                    </div>
-                </div>`).join('');
-        };
-
-        const renderShop = () => {
-            const filter = document.getElementById('category-filter');
-            filter.innerHTML = CATEGORIES.map(c => `
-                <button onclick="setActiveCategory('${c.id}')" class="flex-shrink-0 px-6 py-3 rounded-xl border ${activeCategory === c.id ? 'bg-white/10 border-white/20' : 'opacity-50 border-transparent'}">
-                    <span class="font-bold text-xs uppercase">${c.emoji} ${c.name}</span>
-                </button>
-            `).join('');
-
-            const grid = document.getElementById('shop-grid');
-            const products = PRODUCTS.filter(item => item.category === activeCategory);
-            grid.innerHTML = products.map(item => `
-                <div class="bg-white/5 border border-white/5 rounded-[2.5rem] p-10 text-center">
-                    <div class="text-8xl mb-6">${item.img}</div>
-                    <p class="text-sm text-slate-400 uppercase tracking-[0.2em] mb-2">${item.label}</p>
-                    <h3 class="text-2xl font-bold uppercase">${item.name}</h3>
-                    <div class="flex items-center justify-between mt-8">
-                        <span class="text-3xl font-black">₹${item.price}</span>
-                        <button onclick="addItemToBag('${item.id}')" class="bg-white text-black px-6 py-3 rounded-xl font-bold">ADD</button>
-                    </div>
-                </div>`).join('');
-        };
-
-        window.setActiveCategory = (id) => { activeCategory = id; renderShop(); };
-
-        window.addItemToBag = (itemId) => {
-            const itemBase = PRODUCTS.find(p => p.id === itemId) || TRENDING.find(p => p.id === itemId);
-            if (!itemBase) return;
-            cartManagerAddToCart(itemBase.name, itemBase.price, itemBase.id);
-            if (typeof updateCartDisplay === 'function') updateCartDisplay();
-        };
-
-        const updateCartCount = () => {
-            // Cart badge is now handled by cart-manager.js and the header component
-        };
-
-        const renderCart = () => {
-            // Cart display is now handled by the cart-panel component
-        };
-
-        window.removeFromCart = (cid) => { /* Handled by cart-manager.js */ };
-        const showToast = () => { /* Handled by cart-manager.js */ };
-        
-        // Payment form handler
-        document.getElementById('payment-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert('Payment successful! Thank you for your purchase.');
-            cart = [];
-            persistCart();
-            updateCartCount();
-            showView('home');
-        });
-
-        window.onload = () => {
-            // Cart is initialized by cart-manager.js
-            initializeCart();
-            updateCartCount();
-            renderHome();
-            if (availableCategory && CATEGORIES.some(c => c.id === availableCategory)) {
-                showView('shop');
-            }
-        };
+            </section>
+</main>
+<script>
+        ReyvalStorefront.hydrateChrome();
+        ReyvalStorefront.renderHomePage();
     </script>
 </body>
 </html>

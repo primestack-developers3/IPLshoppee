@@ -6,6 +6,9 @@
     <title>Checkout | Reyval</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="cart-manager.js"></script>
+    <script src="data/reyval-catalog.js"></script>
+    <script src="scripts/reyval-order-tools.js"></script>
     <style>
         body {
             font-family: 'Space Grotesk', sans-serif;
@@ -19,67 +22,23 @@
             border-radius: 0.75rem;
             padding: 0.875rem 1rem;
             color: #f1f5f9;
-            font-family: 'Space Grotesk', sans-serif;
+            width: 100%;
             transition: all 0.3s ease;
         }
 
         .form-input:focus {
             outline: none;
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(37, 99, 235, 0.5);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: rgba(212, 175, 55, 0.55);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
         }
 
         .form-input::placeholder {
-            color: rgba(241, 245, 249, 0.4);
-        }
-
-        .error-message {
-            color: #ef4444;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-            display: none;
-        }
-
-        .form-group.error .form-input {
-            border-color: rgba(239, 68, 68, 0.5);
-            background: rgba(239, 68, 68, 0.05);
-        }
-
-        .form-group.error .error-message {
-            display: block;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            color: white;
-            padding: 0.875rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            border: none;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
+            color: rgba(241, 245, 249, 0.35);
         }
 
         .section {
             background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 1.5rem;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
@@ -87,71 +46,114 @@
 
         .section-title {
             font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            font-weight: 800;
+            margin-bottom: 1.25rem;
         }
 
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: #2563eb;
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 700;
-            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-            transform: translateY(calc(100% + 1rem));
-            transition: transform 0.3s ease;
+        .form-group.error .form-input {
+            border-color: rgba(239, 68, 68, 0.55);
+            background: rgba(239, 68, 68, 0.06);
         }
 
-        .toast.show {
-            transform: translateY(0);
+        .error-message {
+            display: none;
+            color: #f87171;
+            font-size: 0.875rem;
+            margin-top: 0.4rem;
         }
 
-        .toast.error {
-            background: #ef4444;
+        .form-group.error .error-message {
+            display: block;
         }
 
-        .toast.success {
-            background: #10b981;
+        .btn-primary {
+            width: 100%;
+            border: none;
+            border-radius: 0.95rem;
+            padding: 1rem 1.4rem;
+            background: linear-gradient(135deg, #d4af37 0%, #f3e8c1 100%);
+            color: #09110b;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 32px rgba(212, 175, 55, 0.22);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .info-box {
+            background: rgba(212, 175, 55, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.22);
+            border-radius: 1rem;
+            padding: 1rem;
+            color: #f3e8c1;
+            font-size: 0.93rem;
+            line-height: 1.65;
+        }
+
+        .info-box strong {
+            color: #fff5d6;
         }
 
         .order-summary-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 1rem;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .order-summary-item:last-child {
             border-bottom: none;
         }
 
-        .warning-box {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            border-radius: 0.75rem;
-            padding: 1rem;
-            color: #fbbf24;
-            font-size: 0.875rem;
-            line-height: 1.5;
-            margin-bottom: 1.5rem;
+        .toast {
+            position: fixed;
+            right: 1.5rem;
+            bottom: 1.5rem;
+            transform: translateY(calc(100% + 1rem));
+            transition: transform 0.25s ease;
+            z-index: 1000;
+            padding: 0.95rem 1.2rem;
+            border-radius: 0.85rem;
+            font-weight: 700;
+            box-shadow: 0 18px 30px rgba(0, 0, 0, 0.28);
+            color: white;
+            background: #2563eb;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast.success {
+            background: #059669;
+        }
+
+        .toast.error {
+            background: #dc2626;
         }
 
         .loading-spinner {
             display: inline-block;
             width: 1rem;
             height: 1rem;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
-            border-radius: 50%;
+            border-radius: 999px;
             animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 0.5rem;
         }
 
         @keyframes spin {
@@ -160,154 +162,89 @@
     </style>
 </head>
 <body class="min-h-screen py-8 px-4">
-    <!-- Header Component -->
     <div id="header-container" class="mb-8"></div>
     <script>
-      fetch('./components/header.html')
-        .then(response => response.text())
-        .then(html => {
-          document.getElementById('header-container').innerHTML = html;
-          initializeCart();
-          updateCartCount();
-        });
+        fetch('./components/header.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('header-container').innerHTML = html;
+                initializeCart();
+                updateCartCount();
+            });
     </script>
 
-    <div class="max-w-2xl mx-auto">
-
-        <!-- Header -->
+    <div class="max-w-3xl mx-auto">
         <div class="mb-8">
             <h1 class="text-3xl font-black italic tracking-tighter uppercase">Reyval Checkout</h1>
-            <p class="text-[#F5F5DC]/70 text-sm mt-2">Finalize your refined wardrobe order and complete the demo checkout.</p>
+            <p class="text-[#F5F5DC]/70 text-sm mt-2">Capture payment details, customer information, and sourcing-ready order data in one flow.</p>
         </div>
 
-        <!-- Demo Notice -->
-        <div class="warning-box">
-                🎯 <strong>Demo Mode:</strong> This is a demonstration of the Reyval checkout flow. No real payments are processed — orders are saved for admin review only.
+        <div class="info-box mb-6">
+            <p id="paymentModeLabel"><strong>Checkout status:</strong> Loading payment configuration...</p>
+        </div>
 
-        <!-- Customer Details Section -->
         <div class="section">
-            <div class="section-title">
-                <span>👤</span>
-                <span>Customer Details</span>
-            </div>
-
-            <form id="checkoutForm">
-                <div class="form-group mb-4">
-                    <label class="block text-sm font-600 mb-2" for="fullName">Full Name</label>
-                    <input
-                        type="text"
-                        id="fullName"
-                        name="fullName"
-                        class="form-input"
-                        placeholder="Enter your full name"
-                        required
-                    />
-                    <div class="error-message">Full name is required</div>
+            <div class="section-title">Customer Details</div>
+            <form id="checkoutForm" onsubmit="event.preventDefault(); handlePayment();">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold mb-2" for="fullName">Full Name</label>
+                        <input id="fullName" class="form-input" type="text" placeholder="Enter full name">
+                        <div class="error-message">Full name is required.</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold mb-2" for="phone">Phone Number</label>
+                        <input id="phone" class="form-input" type="tel" placeholder="10-digit mobile number">
+                        <div class="error-message">Enter a valid 10-digit phone number.</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold mb-2" for="email">Email</label>
+                        <input id="email" class="form-input" type="email" placeholder="name@example.com">
+                        <div class="error-message">Enter a valid email address.</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold mb-2" for="pincode">Pincode</label>
+                        <input id="pincode" class="form-input" type="text" placeholder="6-digit pincode">
+                        <div class="error-message">Enter a valid 6-digit pincode.</div>
+                    </div>
                 </div>
 
-                <div class="form-group mb-4">
-                    <label class="block text-sm font-600 mb-2" for="phone">Phone Number</label>
-                    <input
-                        type="tel"
-                        id="phone"
-                        name="phone"
-                        class="form-input"
-                        placeholder="Enter 10-digit phone number"
-                        pattern="\d{10}"
-                        required
-                    />
-                    <div class="error-message">Valid 10-digit phone number required</div>
-                </div>
-
-                <div class="form-group mb-6">
-                    <label class="block text-sm font-600 mb-2" for="address">Full Address</label>
-                    <textarea
-                        id="address"
-                        name="address"
-                        class="form-input"
-                        placeholder="Enter your complete address (street, city, state, pincode)"
-                        rows="4"
-                        required
-                    ></textarea>
-                    <div class="error-message">Address is required</div>
+                <div class="form-group mt-4">
+                    <label class="block text-sm font-semibold mb-2" for="address">Delivery Address</label>
+                    <textarea id="address" class="form-input" rows="4" placeholder="Street, city, state, landmark"></textarea>
+                    <div class="error-message">Address is required.</div>
                 </div>
             </form>
         </div>
 
-        <!-- Order Summary Section -->
         <div class="section">
-            <div class="section-title">
-                <span>📦</span>
-                <span>Order Summary</span>
-            </div>
-
-            <div id="orderSummary" class="mb-6">
-                <!-- Items will be rendered here -->
-            </div>
-
-            <div class="border-t border-blue-500 pt-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-lg font-700">Total Amount</span>
-                    <span class="text-2xl font-black text-blue-400">₹<span id="totalAmount">0</span></span>
-                </div>
+            <div class="section-title">Order Summary</div>
+            <div id="orderSummary" class="mb-4"></div>
+            <div class="border-t border-white/10 pt-4 flex justify-between items-center">
+                <span class="text-lg font-bold">Total Amount</span>
+                <span class="text-2xl font-black text-[#d4af37]">Rs. <span id="totalAmount">0</span></span>
             </div>
         </div>
 
-        <!-- Payment Section -->
         <div class="section">
-            <div class="section-title">
-                <span>🛍️</span>
-                <span>Place Your Order</span>
-            </div>
-
-            <button
-                id="payNowBtn"
-                class="btn-primary"
-                onclick="handlePayment()"
-            >
-                Place Order (Demo)
-            </button>
-
-            <div class="bg-[#d4af37]/10 border border-[#d4af37]/30 rounded-lg p-4 mt-4 text-[#f8f3e9]">
-                <p class="text-sm">
-                    🎯 <strong>Demo Mode:</strong> This is a demonstration website. No real payment will be processed.
-                </p>
-                <p class="text-sm mt-2">
-                    📋 Your order will be saved and visible in the admin panel for review.
-                </p>
-            </div>
-
-            <p class="text-slate-500 text-xs text-center mt-4">
-                ✓ Demo order processing<br/>
-                ✓ Your clothing order is stored locally for review
+            <div class="section-title">Payment & Order Capture</div>
+            <button id="payNowBtn" class="btn-primary" onclick="handlePayment()">Place Order</button>
+            <div id="paymentModePanel" class="info-box mt-4"></div>
+            <p class="text-slate-400 text-xs text-center mt-4">
+                Customer orders are saved with revenue, estimated source cost, and product sourcing links.
             </p>
         </div>
 
-        <!-- Back to Cart Link -->
         <div class="text-center">
-            <button
-                class="text-blue-400 hover:text-blue-300 text-sm font-600 transition-colors"
-                onclick="goBackToCart()"
-            >
-                ← Back to Cart
+            <button class="text-[#d4af37] hover:text-[#f3e8c1] text-sm font-semibold transition-colors" onclick="goBackToCart()">
+                Back to Cart
             </button>
         </div>
     </div>
 
-    <!-- Toast -->
     <div id="toast" class="toast"></div>
 
-    <!-- Razorpay Script -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-    <!-- Scripts -->
-    <script src="cart-manager.js"></script>
     <script src="checkout.js"></script>
-    <script>
-      // Initialize checkout
-      document.addEventListener('DOMContentLoaded', function() {
-        renderOrderSummary();
-      });
-    </script>
 </body>
 </html>

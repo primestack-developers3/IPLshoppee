@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reyval | Search</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles/reyval-storefront.css">
+    <script src="./cart-manager.js"></script>
+    <script src="./data/reyval-catalog.js"></script>
+    <script src="./scripts/reyval-storefront.js"></script>
+    <script src="./scripts/reyval-search.js"></script>
+</head>
+<body>
+    <div id="header-container"></div>
+    <div id="cart-panel-container"></div>
+
+    <main class="page-shell">
+        <div class="container">
+            <section class="hero">
+                <div class="eyebrow">Reyval Search</div>
+                <h1 class="hero-title">Search every Reyval product and see exactly where it lives.</h1>
+                <p class="hero-copy">
+                    Use this page to explore the full catalog by product name, description, category, or label.
+                    Each result shows the collection location so you can jump directly to the right page.
+                </p>
+                <div class="hero-actions">
+                    <a class="hero-button" href="home.html">Back to Home</a>
+                    <a class="secondary-button" href="cart.html">View Your Bag</a>
+                </div>
+            </section>
+
+            <section class="section-block">
+                <div class="search-page-shell">
+                    <div class="search-panel search-panel-spotlight">
+                        <div>
+                            <div class="section-kicker">Dedicated Search Page</div>
+                            <p class="search-results-copy">Find a product, then open its collection location right from the result card.</p>
+                        </div>
+                        <form id="search-page-form" class="search-form">
+                            <input id="search-page-input" class="search-input" type="search" placeholder="Search shirts, dresses, kids sets, bags..." aria-label="Search Reyval catalog">
+                            <button class="search-button" type="submit">Search</button>
+                            <button id="search-page-clear" class="search-clear" type="button">Clear</button>
+                        </form>
+                        <p id="search-page-status" class="search-results-copy">Search the catalog to reveal up to 6 matching products.</p>
+                        <nav id="search-category-links" class="category-nav" aria-label="Collection quick links"></nav>
+                    </div>
+
+                    <div id="search-results" class="product-grid"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        ReyvalStorefront.hydrateChrome();
+        ReyvalSearch.renderPage();
+    </script>
+</body>
+</html>
