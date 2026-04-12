@@ -1,0 +1,165 @@
+<style>
+  :root {
+    --bg: rgba(8, 12, 11, 0.95);
+    --panel: rgba(20, 33, 29, 0.92);
+    --border: rgba(212, 175, 55, 0.18);
+    --accent: #d4af37;
+    --accent-strong: #f3e8c1;
+    --text: #f8f3e9;
+    --muted: rgba(248, 243, 233, 0.65);
+  }
+
+  .reyval-footer {
+    background: var(--bg);
+    border-top: 1px solid rgba(212, 175, 55, 0.14);
+    padding: 3rem 2rem 2rem;
+    font-family: 'Manrope', sans-serif;
+    color: var(--text);
+    margin-top: auto;
+  }
+
+  .reyval-footer-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .footer-section h3 {
+    color: var(--accent);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .footer-section p {
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .footer-links li {
+    margin-bottom: 0.5rem;
+  }
+
+  .footer-links a {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .footer-links a:hover {
+    color: var(--accent);
+  }
+
+  .footer-bottom {
+    border-top: 1px solid rgba(212, 175, 55, 0.08);
+    padding-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-copyright {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .footer-social {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .social-link {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+  }
+
+  .social-link:hover {
+    color: var(--accent);
+  }
+
+  @media (max-width: 768px) {
+    .reyval-footer {
+      padding: 2rem 1rem 1.5rem;
+    }
+
+    .footer-content {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .footer-bottom {
+      flex-direction: column;
+      text-align: center;
+      gap: 1rem;
+    }
+  }
+</style>
+
+<footer class="reyval-footer">
+  <div class="reyval-footer-inner">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Reyval</h3>
+        <p>Luxury collections reimagined for modern royalty. Discover premium fashion for men, women, children, and statement accessories with editorial product cards and polished descriptions.</p>
+      </div>
+
+      <div class="footer-section">
+        <h3>Collections</h3>
+        <ul class="footer-links">
+          <li><a href="men.html">Men</a></li>
+          <li><a href="women.html">Women</a></li>
+          <li><a href="children.html">Children</a></li>
+          <li><a href="accessories.html">Accessories</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h3>Customer Service</h3>
+        <ul class="footer-links">
+          <li><a href="cart.html">Shopping Bag</a></li>
+          <li><a href="orders.html">Order Tracking</a></li>
+          <li><a href="search.html">Product Search</a></li>
+          <li><a href="checkout.html">Secure Checkout</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h3>Staff Access</h3>
+        <ul class="footer-links">
+          <li><a href="staff.html">Staff Portal</a></li>
+          <li><a href="admin/orders.html">Admin Dashboard</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-copyright">
+        © 2026 Reyval. All rights reserved. Powered by Meesho trends.
+      </div>
+      <div class="footer-social">
+        <a href="#" class="social-link" aria-label="Facebook">📘</a>
+        <a href="#" class="social-link" aria-label="Instagram">📷</a>
+        <a href="#" class="social-link" aria-label="Twitter">🐦</a>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -183,6 +183,12 @@
                 initializeCart();
                 updateCartCount();
             });
+
+        fetch('./components/footer.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('footer-container').innerHTML = html;
+            });
     </script>
 
     <main class="page-shell">
@@ -236,6 +242,8 @@
             </div>
         </section>
     </main>
+
+    <div id="footer-container"></div>
 
     <script>
         function renderSuccessOrder(order) {

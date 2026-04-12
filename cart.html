@@ -182,6 +182,12 @@
           initializeCart();
           updateCartCount();
         });
+
+      fetch('./components/footer.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('footer-container').innerHTML = html;
+        });
     </script>
 
     <!-- Cart Content -->
@@ -205,6 +211,8 @@
             </div>
         </div>
     </main>
+
+    <div id="footer-container"></div>
 
     <script>
         // Render cart items

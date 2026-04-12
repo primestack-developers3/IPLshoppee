@@ -244,6 +244,16 @@
 
     <div id="toast" class="toast"></div>
 
+    <div id="footer-container"></div>
+
+    <script>
+        fetch('./components/footer.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('footer-container').innerHTML = html;
+            });
+    </script>
+
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="checkout.js"></script>
 </body>
