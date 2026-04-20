@@ -11,7 +11,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = __dirname;
 const DATA_DIR = path.join(ROOT_DIR, 'data');
-const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
 const CATALOG_FILE = path.join(DATA_DIR, 'reyval-catalog.js');
 const ENV_FILE = path.join(ROOT_DIR, '.env.local');
 
@@ -164,24 +163,6 @@ async function getStorageContext() {
   };
 }
 
-async function ensureOrdersFile() {
-  await mkdir(DATA_DIR, { recursive: true });
-  if (!existsSync(ORDERS_FILE)) {
-    await writeFile(ORDERS_FILE, '[]\n', 'utf8');
-  }
-}
-
-async function loadLocalOrders() {
-  await ensureOrdersFile();
-  const raw = await readFile(ORDERS_FILE, 'utf8');
-  return JSON.parse(raw || '[]');
-}
-
-async function saveLocalOrders(orders) {
-  await ensureOrdersFile();
-  await writeFile(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf8');
-}
-
 async function loadCatalog() {
   const raw = await readFile(CATALOG_FILE, 'utf8');
   const jsonText = raw.replace(/^window\.REYVAL_CATALOG = /, '').replace(/;\s*$/, '');
@@ -264,21 +245,8 @@ async function loadOrders() {
     return orders.sort((left, right) => new Date(right.createdAt || 0) - new Date(left.createdAt || 0));
   }
 
-  const orders = await loadLocalOrders();
-  let changed = false;
-  const nextOrders = orders.map(order => {
-    const next = applyOrderLifecyclePolicies(order);
-    if (next.changed) {
-      changed = true;
-    }
-    return next.order;
-  });
-
-  if (changed) {
-    await saveLocalOrders(nextOrders);
-  }
-
-  return nextOrders.sort((left, right) => new Date(right.createdAt || 0) - new Date(left.createdAt || 0));
+  // No local fallback - use only Firebase
+  throw new Error('Firebase storage is required for orders');
 }
 
 async function loadOrderById(orderId) {
@@ -299,18 +267,8 @@ async function loadOrderById(orderId) {
     return next.order;
   }
 
-  const orders = await loadLocalOrders();
-  const index = orders.findIndex(order => order.orderId === orderId);
-  if (index === -1) {
-    return null;
-  }
-
-  const next = applyOrderLifecyclePolicies(orders[index]);
-  if (next.changed) {
-    orders[index] = next.order;
-    await saveLocalOrders(orders);
-  }
-  return next.order;
+  // No local fallback - use only Firebase
+  throw new Error('Firebase storage is required for orders');
 }
 
 async function saveOrder(order) {
@@ -321,10 +279,8 @@ async function saveOrder(order) {
     return order;
   }
 
-  const orders = await loadLocalOrders();
-  orders.push(order);
-  await saveLocalOrders(orders);
-  return order;
+  // No local fallback - use only Firebase
+  throw new Error('Firebase storage is required for orders');
 }
 
 async function updateOrder(orderId, nextOrder) {
@@ -335,15 +291,8 @@ async function updateOrder(orderId, nextOrder) {
     return nextOrder;
   }
 
-  const orders = await loadLocalOrders();
-  const index = orders.findIndex(order => order.orderId === orderId);
-  if (index === -1) {
-    return null;
-  }
-
-  orders[index] = nextOrder;
-  await saveLocalOrders(orders);
-  return nextOrder;
+  // No local fallback - use only Firebase
+  throw new Error('Firebase storage is required for orders');
 }
 
 async function saveCustomer(customer) {
@@ -396,10 +345,8 @@ async function loadCustomerById(customerId) {
     return null;
   }
 
-  // For local storage, find customer from orders
-  const orders = await loadLocalOrders();
-  const order = orders.find(o => o.customerId === customerId);
-  return order ? order.customer : null;
+  // No local fallback - use only Firebase
+  throw new Error('Firebase storage is required for customers');
 }
 
 async function updateProduct(productId, patch) {
