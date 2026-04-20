@@ -11,6 +11,8 @@
     "sync:firebase-products": "node scripts/sync-reyval-firebase-catalog.mjs"
   },
   "dependencies": {
-    "firebase-admin": "^13.0.0"
+    "firebase-admin": "^13.0.0",
+    "pdfkit": "^0.15.0",
+    "googleapis": "^144.0.0"
   }
 }

@@ -238,7 +238,8 @@
             </div>
 
             <div class="button-group">
-                <a href="home.html" class="btn-primary">Continue Shopping</a>
+                <a href="#" id="downloadBillBtn" class="btn-primary">Download Invoice</a>
+                <a href="home.html" class="btn-secondary">Continue Shopping</a>
             </div>
         </section>
     </main>
@@ -314,6 +315,21 @@
             }
 
             renderSuccessOrder(order);
+
+            // Setup download bill button
+            const downloadBtn = document.getElementById('downloadBillBtn');
+            if (downloadBtn && order) {
+                downloadBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const link = document.createElement('a');
+                    link.href = `/api/orders/${order.orderId}/bill`;
+                    link.download = `Invoice_${order.orderId}.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+            }
+
             sessionStorage.removeItem('checkoutTotal');
             sessionStorage.removeItem('orderSuccessId');
         }

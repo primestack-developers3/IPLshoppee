@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { createReadStream, existsSync } from 'node:fs';
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { getFirebaseFirestore, loadEnvFile, readSafeFile } from './firebase-utils.mjs';
+import { generateAndSaveBill } from './bill-generator.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +22,7 @@ const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_R
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
 const FIREBASE_ORDERS_COLLECTION = process.env.FIREBASE_ORDERS_COLLECTION || 'reyval_orders';
 const FIREBASE_PRODUCTS_COLLECTION = process.env.FIREBASE_PRODUCTS_COLLECTION || 'reyval_products';
+const FIREBASE_CUSTOMERS_COLLECTION = process.env.FIREBASE_CUSTOMERS_COLLECTION || 'reyval_customers';
 const AUTO_CANCEL_WINDOW_MS = 30 * 60 * 60 * 1000;
 const AUTO_CANCEL_SWEEP_INTERVAL_MS = 15 * 60 * 1000;
 const ORDER_STATUS_VALUES = new Set(['pending', 'placed', 'shipped', 'delivered', 'cancelled']);
@@ -344,6 +346,62 @@ async function updateOrder(orderId, nextOrder) {
   return nextOrder;
 }
 
+async function saveCustomer(customer) {
+  const storage = await getStorageContext();
+
+  if (storage.firebaseEnabled && storage.db) {
+    await storage.db.collection(FIREBASE_CUSTOMERS_COLLECTION).doc(customer.customerId.toString()).set(customer, { merge: false });
+    return customer;
+  }
+
+  // For local storage, customers are embedded in orders, so no separate save needed
+  return customer;
+}
+
+async function loadCustomerByIdFromOrdersOrCustomers(customer) {
+  // First try to find by phone or email in customers collection
+  const storage = await getStorageContext();
+  if (storage.firebaseEnabled && storage.db) {
+    const customersRef = storage.db.collection(FIREBASE_CUSTOMERS_COLLECTION);
+    const phoneQuery = await customersRef.where('phone', '==', customer.phone).get();
+    if (!phoneQuery.empty) {
+      const doc = phoneQuery.docs[0];
+      return { customerId: doc.id, ...doc.data() };
+    }
+    if (customer.email) {
+      const emailQuery = await customersRef.where('email', '==', customer.email).get();
+      if (!emailQuery.empty) {
+        const doc = emailQuery.docs[0];
+        return { customerId: doc.id, ...doc.data() };
+      }
+    }
+  }
+
+  // Fallback to orders
+  const orders = await loadOrders();
+  return orders.find(order =>
+    order.customer?.phone === customer.phone ||
+    (customer.email && order.customer?.email === customer.email)
+  );
+}
+
+async function loadCustomerById(customerId) {
+  const storage = await getStorageContext();
+
+  if (storage.firebaseEnabled && storage.db) {
+    const doc = await storage.db.collection(FIREBASE_CUSTOMERS_COLLECTION).doc(customerId.toString()).get();
+    if (doc.exists) {
+      return { customerId, ...doc.data() };
+    }
+    return null;
+  }
+
+  // For local storage, find customer from orders
+  const orders = await loadLocalOrders();
+  const order = orders.find(o => o.customerId === customerId);
+  return order ? order.customer : null;
+}
+
 async function updateProduct(productId, patch) {
   const storage = await getStorageContext();
   if (!(storage.firebaseEnabled && storage.db)) {
@@ -496,13 +554,26 @@ async function buildOrder({ customer, cart, payment, source = 'server-api' }) {
   const paymentSnapshot = buildPayment(payment, totals);
 
   const orderNumber = orders.reduce((max, order) => Math.max(max, toNumber(order.orderNumber, 0)), 0) + 1;
-  const existingCustomer = orders.find(order =>
-    order.customer?.phone === normalizedCustomer.phone ||
-    (normalizedCustomer.email && order.customer?.email === normalizedCustomer.email)
-  );
-  const customerId = existingCustomer
-    ? existingCustomer.customerId
-    : orders.reduce((max, order) => Math.max(max, toNumber(order.customerId, 0)), 0) + 1;
+
+  // Check if customer exists
+  let customerId;
+  const existingCustomer = await loadCustomerByIdFromOrdersOrCustomers(normalizedCustomer);
+  if (existingCustomer) {
+    customerId = existingCustomer.customerId;
+  } else {
+    // Assign new customer ID
+    const allOrders = await loadOrders();
+    customerId = allOrders.reduce((max, order) => Math.max(max, toNumber(order.customerId, 0)), 0) + 1;
+    // Save new customer
+    const customerRecord = {
+      customerId,
+      ...normalizedCustomer,
+      firstOrderAt: nowIso(),
+      totalOrders: 0,
+      totalSpent: 0
+    };
+    await saveCustomer(customerRecord);
+  }
 
   return {
     orderId: `ORDER_${String(orderNumber).padStart(4, '0')}`,
@@ -910,6 +981,34 @@ async function handleApi(request, response, url) {
       source: 'server-api'
     });
     await saveOrder(order);
+
+    // Update customer stats
+    try {
+      const customer = await loadCustomerById(order.customerId);
+      if (customer) {
+        customer.totalOrders = (customer.totalOrders || 0) + 1;
+        customer.totalSpent = (customer.totalSpent || 0) + order.totals.revenue;
+        customer.lastOrderAt = order.createdAt;
+        await saveCustomer(customer);
+      }
+    } catch (error) {
+      console.error('Customer update failed:', error);
+    }
+
+    // Generate and save bill
+    try {
+      const billResult = await generateAndSaveBill(order);
+      order.bill = {
+        generated: true,
+        driveFileId: billResult.driveFileId,
+        pdfAvailable: true
+      };
+      await updateOrder(order.orderId, order); // Update order with bill info
+    } catch (error) {
+      console.error('Bill generation failed:', error);
+      order.bill = { generated: false, error: error.message };
+    }
+
     sendJson(response, 201, { order });
     return true;
   }
@@ -946,6 +1045,23 @@ async function handleApi(request, response, url) {
     const nextOrder = applyOrderUpdate(currentOrder, body);
     await updateOrder(orderId, nextOrder);
     sendJson(response, 200, { order: nextOrder });
+    return true;
+  }
+
+  if (request.method === 'GET' && url.pathname.endsWith('/bill')) {
+    const billOrderId = url.pathname.split('/').slice(-2)[0]; // Extract orderId from /api/orders/{orderId}/bill
+    const order = await loadOrderById(billOrderId);
+    if (!order) {
+      sendError(response, 404, `Order ${billOrderId} was not found.`);
+      return true;
+    }
+
+    const { pdfBuffer } = await generateAndSaveBill(order);
+    response.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="Invoice_${order.orderId}.pdf"`
+    });
+    response.end(pdfBuffer);
     return true;
   }
 
