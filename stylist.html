@@ -1,3 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reyval Personal Stylist</title>
+    <link rel="stylesheet" href="styles/stylist.css">
+</head>
+<body>
 <style>
   :root {
     --bg: rgba(8, 12, 11, 0.95);
@@ -150,3 +159,31 @@
 </header>
 
 <div style="margin-top: 92px;"></div>
+
+   <br><br><br><br> <div class="stylist-container">
+        <header class="stylist-header">
+            <h1>Reyval Personal Stylist</h1>
+            <p>Your royal fashion advisor awaits</p>
+        </header>
+        
+        <div class="chat-container">
+            <div id="chat-messages" class="chat-messages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <p>Welcome to Reyval, Your Royal Highness. I am your personal fashion stylist. Allow me to curate the perfect ensemble for your occasion. Shall we begin?</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Type your response..." disabled>
+                <button id="mic-btn" class="mic-btn">🎤</button>
+                <button id="send-btn" class="send-btn" disabled>Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="data/reyval-catalog.js"></script>
+    <script src="scripts/stylist-chatbot-new.js"></script>
+</body>
+</html>

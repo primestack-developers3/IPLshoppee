@@ -779,10 +779,40 @@ function buildOrderUpdatePayload(form) {
 }
 
 async function refreshAnalytics() {
+  let serverAnalytics = null;
+  let localAnalytics = ReyvalOrderTools.getLocalAnalytics();
+  
   try {
-    adminState.analytics = await requestAdminData('/api/analytics');
+    serverAnalytics = await requestAdminData('/api/analytics');
   } catch (error) {
-    adminState.analytics = ReyvalOrderTools.getLocalAnalytics();
+    console.log('Server analytics not available, using local analytics');
+  }
+  
+  if (serverAnalytics) {
+    // Merge server and local orders, avoiding duplicates by orderId
+    const serverOrderIds = new Set(serverAnalytics.recentOrders.map(order => order.orderId));
+    const uniqueLocalOrders = localAnalytics.recentOrders.filter(order => !serverOrderIds.has(order.orderId));
+    
+    adminState.analytics = {
+      ...serverAnalytics,
+      recentOrders: [...serverAnalytics.recentOrders, ...uniqueLocalOrders],
+      totals: {
+        orders: serverAnalytics.totals.orders + uniqueLocalOrders.length,
+        units: serverAnalytics.totals.units + localAnalytics.totals.units,
+        revenue: serverAnalytics.totals.revenue + localAnalytics.totals.revenue,
+        sourceCost: serverAnalytics.totals.sourceCost + localAnalytics.totals.sourceCost,
+        grossProfit: serverAnalytics.totals.grossProfit + localAnalytics.totals.grossProfit
+      },
+      statusBreakdown: {
+        pending: serverAnalytics.statusBreakdown.pending + localAnalytics.statusBreakdown.pending,
+        placed: serverAnalytics.statusBreakdown.placed + localAnalytics.statusBreakdown.placed,
+        shipped: serverAnalytics.statusBreakdown.shipped + localAnalytics.statusBreakdown.shipped,
+        delivered: serverAnalytics.statusBreakdown.delivered + localAnalytics.statusBreakdown.delivered,
+        cancelled: serverAnalytics.statusBreakdown.cancelled + localAnalytics.statusBreakdown.cancelled
+      }
+    };
+  } else {
+    adminState.analytics = localAnalytics;
   }
 }
 
@@ -828,7 +858,7 @@ async function saveOrderUpdate(orderId, payload) {
     if (typeof ReyvalOrderTools.updateLocalOrder === 'function') {
       const localOrder = ReyvalOrderTools.updateLocalOrder(orderId, payload);
       if (localOrder) {
-        adminState.analytics = ReyvalOrderTools.getLocalAnalytics();
+        await refreshAnalytics(); // Refresh to merge server + updated local
         renderDashboard();
         return true;
       }
