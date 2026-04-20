@@ -59,7 +59,22 @@ function parseInlineServiceAccount(rawValue) {
 }
 
 export function getFirebaseServiceAccount(env = process.env) {
-  const inline = parseInlineServiceAccount(env.FIREBASE_SERVICE_ACCOUNT_JSON || '');
+  // Try to load from separate file first
+  if (existsSync('firebase-service-account.json')) {
+    try {
+      const content = readSafeFile('firebase-service-account.json');
+      const parsed = JSON.parse(content);
+      return {
+        projectId: parsed.project_id || parsed.projectId || '',
+        clientEmail: parsed.client_email || parsed.clientEmail || '',
+        privateKey: normalizePrivateKey(parsed.private_key || parsed.privateKey || '')
+      };
+    } catch (error) {
+      console.warn('Failed to parse firebase-service-account.json:', error.message);
+    }
+  }
+
+  const inline = parseInlineServiceAccount(env.FIREBASE_SERVICE_ACCOUNT_JSON || env.GOOGLE_SERVICE_ACCOUNT_JSON || '');
   if (inline?.projectId && inline?.clientEmail && inline?.privateKey) {
     return inline;
   }

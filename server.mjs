@@ -225,9 +225,14 @@ async function loadProductCatalog() {
   const storage = await getStorageContext();
 
   if (storage.firebaseEnabled && storage.db) {
-    const firebaseProducts = await loadFirebaseProducts(storage.db);
-    if (firebaseProducts.length) {
-      return firebaseProducts;
+    try {
+      const firebaseProducts = await loadFirebaseProducts(storage.db);
+      if (firebaseProducts.length) {
+        return firebaseProducts;
+      }
+    } catch (error) {
+      console.warn('Firebase products load failed, falling back to local catalog:', error.message);
+      // Fall back to local catalog
     }
   }
 
@@ -244,25 +249,30 @@ async function loadOrders() {
   const storage = await getStorageContext();
 
   if (storage.firebaseEnabled && storage.db) {
-    const snapshot = await storage.db.collection(FIREBASE_ORDERS_COLLECTION).get();
-    const orders = [];
-    const dirtyOrders = [];
+    try {
+      const snapshot = await storage.db.collection(FIREBASE_ORDERS_COLLECTION).get();
+      const orders = [];
+      const dirtyOrders = [];
 
-    snapshot.docs.forEach(doc => {
-      const { order, changed } = applyOrderLifecyclePolicies({ orderId: doc.id, ...doc.data() });
-      orders.push(order);
-      if (changed) {
-        dirtyOrders.push(order);
-      }
-    });
+      snapshot.docs.forEach(doc => {
+        const { order, changed } = applyOrderLifecyclePolicies({ orderId: doc.id, ...doc.data() });
+        orders.push(order);
+        if (changed) {
+          dirtyOrders.push(order);
+        }
+      });
 
-    await Promise.all(
-      dirtyOrders.map(order =>
-        storage.db.collection(FIREBASE_ORDERS_COLLECTION).doc(order.orderId).set(order, { merge: false })
-      )
-    );
+      await Promise.all(
+        dirtyOrders.map(order =>
+          storage.db.collection(FIREBASE_ORDERS_COLLECTION).doc(order.orderId).set(order, { merge: false })
+        )
+      );
 
-    return orders.sort((left, right) => new Date(right.createdAt || 0) - new Date(left.createdAt || 0));
+      return orders.sort((left, right) => new Date(right.createdAt || 0) - new Date(left.createdAt || 0));
+    } catch (error) {
+      console.warn('Firebase load failed, falling back to local storage:', error.message);
+      // Fall back to local storage
+    }
   }
 
   const orders = await readJsonFile(ORDERS_FILE, []);
@@ -291,16 +301,21 @@ async function loadOrderById(orderId) {
   const storage = await getStorageContext();
 
   if (storage.firebaseEnabled && storage.db) {
-    const snapshot = await storage.db.collection(FIREBASE_ORDERS_COLLECTION).doc(orderId).get();
-    if (!snapshot.exists) {
-      return null;
-    }
+    try {
+      const snapshot = await storage.db.collection(FIREBASE_ORDERS_COLLECTION).doc(orderId).get();
+      if (!snapshot.exists) {
+        return null;
+      }
 
-    const next = applyOrderLifecyclePolicies({ orderId: snapshot.id, ...snapshot.data() });
-    if (next.changed) {
-      await storage.db.collection(FIREBASE_ORDERS_COLLECTION).doc(orderId).set(next.order, { merge: false });
+      const next = applyOrderLifecyclePolicies({ orderId: snapshot.id, ...snapshot.data() });
+      if (next.changed) {
+        await storage.db.collection(FIREBASE_ORDERS_COLLECTION).doc(orderId).set(next.order, { merge: false });
+      }
+      return next.order;
+    } catch (error) {
+      console.warn('Firebase load failed, falling back to local storage:', error.message);
+      // Fall back to local storage
     }
-    return next.order;
   }
 
   const orders = await readJsonFile(ORDERS_FILE, []);
@@ -323,8 +338,13 @@ async function saveOrder(order) {
   const storage = await getStorageContext();
 
   if (storage.firebaseEnabled && storage.db) {
-    await storage.db.collection(FIREBASE_ORDERS_COLLECTION).doc(order.orderId).set(order, { merge: false });
-    return order;
+    try {
+      await storage.db.collection(FIREBASE_ORDERS_COLLECTION).doc(order.orderId).set(order, { merge: false });
+      return order;
+    } catch (error) {
+      console.warn('Firebase save failed, falling back to local storage:', error.message);
+      // Fall back to local storage
+    }
   }
 
   const orders = await readJsonFile(ORDERS_FILE, []);
@@ -342,8 +362,13 @@ async function updateOrder(orderId, nextOrder) {
   const storage = await getStorageContext();
 
   if (storage.firebaseEnabled && storage.db) {
-    await storage.db.collection(FIREBASE_ORDERS_COLLECTION).doc(orderId).set(nextOrder, { merge: false });
-    return nextOrder;
+    try {
+      await storage.db.collection(FIREBASE_ORDERS_COLLECTION).doc(orderId).set(nextOrder, { merge: false });
+      return nextOrder;
+    } catch (error) {
+      console.warn('Firebase update failed, falling back to local storage:', error.message);
+      // Fall back to local storage
+    }
   }
 
   const orders = await readJsonFile(ORDERS_FILE, []);
@@ -361,8 +386,13 @@ async function saveCustomer(customer) {
   const storage = await getStorageContext();
 
   if (storage.firebaseEnabled && storage.db) {
-    await storage.db.collection(FIREBASE_CUSTOMERS_COLLECTION).doc(customer.customerId.toString()).set(customer, { merge: false });
-    return customer;
+    try {
+      await storage.db.collection(FIREBASE_CUSTOMERS_COLLECTION).doc(customer.customerId.toString()).set(customer, { merge: false });
+      return customer;
+    } catch (error) {
+      console.warn('Firebase customer save failed, falling back to local storage:', error.message);
+      // Fall back to local storage
+    }
   }
 
   const customers = await readJsonFile(CUSTOMERS_FILE, []);
@@ -379,18 +409,23 @@ async function saveCustomer(customer) {
 async function loadCustomerByIdFromOrdersOrCustomers(customer) {
   const storage = await getStorageContext();
   if (storage.firebaseEnabled && storage.db) {
-    const customersRef = storage.db.collection(FIREBASE_CUSTOMERS_COLLECTION);
-    const phoneQuery = await customersRef.where('phone', '==', customer.phone).get();
-    if (!phoneQuery.empty) {
-      const doc = phoneQuery.docs[0];
-      return { customerId: doc.id, ...doc.data() };
-    }
-    if (customer.email) {
-      const emailQuery = await customersRef.where('email', '==', customer.email).get();
-      if (!emailQuery.empty) {
-        const doc = emailQuery.docs[0];
+    try {
+      const customersRef = storage.db.collection(FIREBASE_CUSTOMERS_COLLECTION);
+      const phoneQuery = await customersRef.where('phone', '==', customer.phone).get();
+      if (!phoneQuery.empty) {
+        const doc = phoneQuery.docs[0];
         return { customerId: doc.id, ...doc.data() };
       }
+      if (customer.email) {
+        const emailQuery = await customersRef.where('email', '==', customer.email).get();
+        if (!emailQuery.empty) {
+          const doc = emailQuery.docs[0];
+          return { customerId: doc.id, ...doc.data() };
+        }
+      }
+    } catch (error) {
+      console.warn('Firebase customer lookup failed, falling back to local:', error.message);
+      // Fall back to local
     }
   }
 
@@ -413,11 +448,16 @@ async function loadCustomerById(customerId) {
   const storage = await getStorageContext();
 
   if (storage.firebaseEnabled && storage.db) {
-    const doc = await storage.db.collection(FIREBASE_CUSTOMERS_COLLECTION).doc(customerId.toString()).get();
-    if (doc.exists) {
-      return { customerId, ...doc.data() };
+    try {
+      const doc = await storage.db.collection(FIREBASE_CUSTOMERS_COLLECTION).doc(customerId.toString()).get();
+      if (doc.exists) {
+        return { customerId, ...doc.data() };
+      }
+      return null;
+    } catch (error) {
+      console.warn('Firebase customer load failed, falling back to local storage:', error.message);
+      // Fall back to local storage
     }
-    return null;
   }
 
   const customers = await readJsonFile(CUSTOMERS_FILE, []);

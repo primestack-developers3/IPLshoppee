@@ -1,0 +1,83 @@
+[
+  {
+    "orderId": "ORDER_0001",
+    "orderNumber": 1,
+    "customerId": 1,
+    "customer": {
+      "name": "Test User",
+      "phone": "1234567890",
+      "email": "test@example.com",
+      "address": "Test Address",
+      "pincode": "123456",
+      "shippingAddress": "Test Address",
+      "shippingPincode": "123456"
+    },
+    "shipping": {
+      "status": "pending",
+      "address": "Test Address",
+      "pincode": "123456",
+      "trackingId": "",
+      "carrier": "",
+      "updatedAt": "2026-04-20T08:21:36.620Z"
+    },
+    "products": [
+      {
+        "id": "test",
+        "name": "Test Product",
+        "category": "General",
+        "categoryId": "general",
+        "imageUrl": "",
+        "sourceUrl": "",
+        "supplierUrl": "",
+        "sourceLabel": "Manual sourcing",
+        "quantity": 1,
+        "saleUnitPrice": 0,
+        "sourceUnitPrice": 0,
+        "lineRevenue": 0,
+        "lineCost": 0,
+        "lineProfit": 0
+      }
+    ],
+    "totals": {
+      "units": 1,
+      "revenue": 0,
+      "sourceCost": 0,
+      "grossProfit": 0
+    },
+    "payment": {
+      "mode": "manual",
+      "provider": "manual",
+      "status": "pending_manual_review",
+      "amount": 0,
+      "currency": "INR",
+      "providerOrderId": "",
+      "providerPaymentId": "",
+      "signature": "",
+      "capturedAt": "",
+      "updatedAt": "2026-04-20T08:21:36.072Z"
+    },
+    "fulfillment": {
+      "status": "pending",
+      "supplierOrderStatus": "pending",
+      "supplierOrderRef": "",
+      "carrier": "",
+      "trackingId": "",
+      "notes": "",
+      "placedAt": "",
+      "shippedAt": "",
+      "deliveredAt": "",
+      "cancelledAt": "",
+      "cancelReason": "",
+      "updatedAt": "2026-04-20T08:21:36.620Z"
+    },
+    "source": "server-api",
+    "createdAt": "2026-04-20T08:21:36.620Z",
+    "updatedAt": "2026-04-20T08:21:36.620Z",
+    "bill": {
+      "generated": true,
+      "driveFileId": null,
+      "localPath": "C:\\Users\\SIDDHU\\Desktop\\IPLshoppee\\data\\bills\\Invoice_ORDER_0001.pdf",
+      "pdfAvailable": true
+    }
+  }
+]

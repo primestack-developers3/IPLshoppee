@@ -1,0 +1,16 @@
+[
+  {
+    "customerId": 1,
+    "name": "Test User",
+    "phone": "1234567890",
+    "email": "test@example.com",
+    "address": "Test Address",
+    "pincode": "123456",
+    "shippingAddress": "Test Address",
+    "shippingPincode": "123456",
+    "firstOrderAt": "2026-04-20T08:21:36.478Z",
+    "totalOrders": 1,
+    "totalSpent": 0,
+    "lastOrderAt": "2026-04-20T08:21:36.620Z"
+  }
+]
