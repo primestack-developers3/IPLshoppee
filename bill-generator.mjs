@@ -8,6 +8,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DRIVE_FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID || ''; // User will provide later
+
+async function getDriveFolderId() {
+  // Try to load from env if not already set
+  if (!DRIVE_FOLDER_ID && process.env.GOOGLE_DRIVE_FOLDER_ID) {
+    return process.env.GOOGLE_DRIVE_FOLDER_ID;
+  }
+  return DRIVE_FOLDER_ID;
+}
 const BILLS_DIR = path.join(__dirname, 'data', 'bills');
 
 async function ensureBillsDir() {
@@ -27,15 +35,34 @@ async function saveBillLocally(pdfBuffer, orderId) {
 }
 
 async function authenticateGoogleDrive() {
-  const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '{}');
-  if (!credentials.client_email || !credentials.private_key) {
+  // Use the same service account loading as Firebase
+  const { getFirebaseServiceAccount } = await import('./firebase-utils.mjs');
+  const creds = getFirebaseServiceAccount();
+  if (!creds) {
     throw new Error('Google Service Account credentials not found');
   }
+
+  // Transform to Google Auth expected format
+  const credentials = {
+    project_id: creds.projectId,
+    client_email: creds.clientEmail,
+    private_key: creds.privateKey
+  };
 
   const auth = new google.auth.GoogleAuth({
     credentials,
     scopes: ['https://www.googleapis.com/auth/drive.file']
   });
+
+  // Test authentication
+  try {
+    const client = await auth.getClient();
+    const token = await client.getAccessToken();
+    console.log('Google Auth successful, token length:', token?.length);
+  } catch (error) {
+    console.error('Google Auth failed:', error.message);
+    throw error;
+  }
 
   return google.drive({ version: 'v3', auth });
 }
@@ -105,7 +132,8 @@ export async function generateBillPDF(order) {
 }
 
 export async function saveBillToDrive(pdfBuffer, orderId) {
-  if (!DRIVE_FOLDER_ID) {
+  const folderId = await getDriveFolderId();
+  if (!folderId) {
     console.warn('Google Drive folder ID not set, skipping upload');
     return null;
   }
@@ -115,12 +143,16 @@ export async function saveBillToDrive(pdfBuffer, orderId) {
 
     const fileMetadata = {
       name: `Invoice_${orderId}.pdf`,
-      parents: [DRIVE_FOLDER_ID]
+      parents: [folderId]
     };
+
+    // Convert buffer to readable stream
+    const { Readable } = await import('stream');
+    const stream = Readable.from(pdfBuffer);
 
     const media = {
       mimeType: 'application/pdf',
-      body: pdfBuffer
+      body: stream
     };
 
     const response = await drive.files.create({
