@@ -8,6 +8,23 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DRIVE_FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID || ''; // User will provide later
+const BILLS_DIR = path.join(__dirname, 'data', 'bills');
+
+async function ensureBillsDir() {
+  await fs.promises.mkdir(BILLS_DIR, { recursive: true });
+}
+
+async function saveBillLocally(pdfBuffer, orderId) {
+  try {
+    await ensureBillsDir();
+    const filePath = path.join(BILLS_DIR, `Invoice_${orderId}.pdf`);
+    await fs.promises.writeFile(filePath, pdfBuffer);
+    return filePath;
+  } catch (error) {
+    console.error('Error saving bill locally:', error);
+    return null;
+  }
+}
 
 async function authenticateGoogleDrive() {
   const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '{}');
@@ -122,5 +139,6 @@ export async function saveBillToDrive(pdfBuffer, orderId) {
 export async function generateAndSaveBill(order) {
   const pdfBuffer = await generateBillPDF(order);
   const driveFileId = await saveBillToDrive(pdfBuffer, order.orderId);
-  return { pdfBuffer, driveFileId };
+  const localFilePath = await saveBillLocally(pdfBuffer, order.orderId);
+  return { pdfBuffer, driveFileId, localFilePath };
 }

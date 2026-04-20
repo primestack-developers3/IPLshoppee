@@ -12,6 +12,8 @@ const __dirname = path.dirname(__filename);
 const ROOT_DIR = __dirname;
 const DATA_DIR = path.join(ROOT_DIR, 'data');
 const CATALOG_FILE = path.join(DATA_DIR, 'reyval-catalog.js');
+const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
+const CUSTOMERS_FILE = path.join(DATA_DIR, 'customers.json');
 const ENV_FILE = path.join(ROOT_DIR, '.env.local');
 
 loadEnvFile(ENV_FILE);
@@ -163,6 +165,24 @@ async function getStorageContext() {
   };
 }
 
+async function ensureDataDir() {
+  await mkdir(DATA_DIR, { recursive: true });
+}
+
+async function readJsonFile(filePath, fallback) {
+  try {
+    const raw = await readFile(filePath, 'utf8');
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+}
+
+async function writeJsonFile(filePath, data) {
+  await ensureDataDir();
+  await writeFile(filePath, JSON.stringify(data ?? [], null, 2), 'utf8');
+}
+
 async function loadCatalog() {
   const raw = await readFile(CATALOG_FILE, 'utf8');
   const jsonText = raw.replace(/^window\.REYVAL_CATALOG = /, '').replace(/;\s*$/, '');
@@ -245,8 +265,24 @@ async function loadOrders() {
     return orders.sort((left, right) => new Date(right.createdAt || 0) - new Date(left.createdAt || 0));
   }
 
-  // No local fallback - use only Firebase
-  throw new Error('Firebase storage is required for orders');
+  const orders = await readJsonFile(ORDERS_FILE, []);
+  const processedOrders = [];
+  const dirtyOrders = [];
+
+  orders.forEach(order => {
+    const next = applyOrderLifecyclePolicies(order);
+    processedOrders.push(next.order);
+    if (next.changed) {
+      dirtyOrders.push(next.order);
+    }
+  });
+
+  if (dirtyOrders.length) {
+    await writeJsonFile(ORDERS_FILE, processedOrders);
+  }
+
+  return processedOrders
+    .sort((left, right) => new Date(right.createdAt || 0) - new Date(left.createdAt || 0));
 }
 
 async function loadOrderById(orderId) {
@@ -267,8 +303,20 @@ async function loadOrderById(orderId) {
     return next.order;
   }
 
-  // No local fallback - use only Firebase
-  throw new Error('Firebase storage is required for orders');
+  const orders = await readJsonFile(ORDERS_FILE, []);
+  const item = orders.find(item => item.orderId === orderId);
+  if (!item) {
+    return null;
+  }
+
+  const next = applyOrderLifecyclePolicies(item);
+  if (next.changed) {
+    const index = orders.findIndex(entry => entry.orderId === orderId);
+    orders[index] = next.order;
+    await writeJsonFile(ORDERS_FILE, orders);
+  }
+
+  return next.order;
 }
 
 async function saveOrder(order) {
@@ -279,8 +327,15 @@ async function saveOrder(order) {
     return order;
   }
 
-  // No local fallback - use only Firebase
-  throw new Error('Firebase storage is required for orders');
+  const orders = await readJsonFile(ORDERS_FILE, []);
+  const index = orders.findIndex(item => item.orderId === order.orderId);
+  if (index >= 0) {
+    orders[index] = order;
+  } else {
+    orders.push(order);
+  }
+  await writeJsonFile(ORDERS_FILE, orders);
+  return order;
 }
 
 async function updateOrder(orderId, nextOrder) {
@@ -291,8 +346,15 @@ async function updateOrder(orderId, nextOrder) {
     return nextOrder;
   }
 
-  // No local fallback - use only Firebase
-  throw new Error('Firebase storage is required for orders');
+  const orders = await readJsonFile(ORDERS_FILE, []);
+  const index = orders.findIndex(item => item.orderId === orderId);
+  if (index >= 0) {
+    orders[index] = nextOrder;
+  } else {
+    orders.push(nextOrder);
+  }
+  await writeJsonFile(ORDERS_FILE, orders);
+  return nextOrder;
 }
 
 async function saveCustomer(customer) {
@@ -303,12 +365,18 @@ async function saveCustomer(customer) {
     return customer;
   }
 
-  // For local storage, customers are embedded in orders, so no separate save needed
+  const customers = await readJsonFile(CUSTOMERS_FILE, []);
+  const index = customers.findIndex(item => String(item.customerId) === String(customer.customerId));
+  if (index >= 0) {
+    customers[index] = customer;
+  } else {
+    customers.push(customer);
+  }
+  await writeJsonFile(CUSTOMERS_FILE, customers);
   return customer;
 }
 
 async function loadCustomerByIdFromOrdersOrCustomers(customer) {
-  // First try to find by phone or email in customers collection
   const storage = await getStorageContext();
   if (storage.firebaseEnabled && storage.db) {
     const customersRef = storage.db.collection(FIREBASE_CUSTOMERS_COLLECTION);
@@ -326,7 +394,14 @@ async function loadCustomerByIdFromOrdersOrCustomers(customer) {
     }
   }
 
-  // Fallback to orders
+  const customers = await readJsonFile(CUSTOMERS_FILE, []);
+  const foundCustomer = customers.find(item =>
+    item.phone === customer.phone || (customer.email && item.email === customer.email)
+  );
+  if (foundCustomer) {
+    return foundCustomer;
+  }
+
   const orders = await loadOrders();
   return orders.find(order =>
     order.customer?.phone === customer.phone ||
@@ -345,8 +420,8 @@ async function loadCustomerById(customerId) {
     return null;
   }
 
-  // No local fallback - use only Firebase
-  throw new Error('Firebase storage is required for customers');
+  const customers = await readJsonFile(CUSTOMERS_FILE, []);
+  return customers.find(item => String(item.customerId) === String(customerId)) || null;
 }
 
 async function updateProduct(productId, patch) {
@@ -948,6 +1023,7 @@ async function handleApi(request, response, url) {
       order.bill = {
         generated: true,
         driveFileId: billResult.driveFileId,
+        localPath: billResult.localFilePath,
         pdfAvailable: true
       };
       await updateOrder(order.orderId, order); // Update order with bill info
@@ -1006,7 +1082,8 @@ async function handleApi(request, response, url) {
     const { pdfBuffer } = await generateAndSaveBill(order);
     response.writeHead(200, {
       'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="Invoice_${order.orderId}.pdf"`
+      'Content-Disposition': `attachment; filename="Invoice_${order.orderId}.pdf"`,
+      'Content-Length': String(pdfBuffer.length)
     });
     response.end(pdfBuffer);
     return true;
