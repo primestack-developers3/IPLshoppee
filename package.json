@@ -8,7 +8,8 @@
   "scripts": {
     "start": "node server.mjs",
     "sync:catalog": "node scripts/sync-reyval-catalog.mjs",
-    "sync:firebase-products": "node scripts/sync-reyval-firebase-catalog.mjs"
+    "sync:firebase-products": "node scripts/sync-reyval-firebase-catalog.mjs",
+    "export:customer-pdfs": "node scripts/export-customer-pdfs.mjs"
   },
   "dependencies": {
     "firebase-admin": "^13.0.0",
