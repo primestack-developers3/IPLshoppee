@@ -11,7 +11,8 @@
     <script src="../data/reyval-catalog.js"></script>
     <script src="../scripts/reyval-order-tools.js"></script>
     <script>
-        window.REYVAL_API_BASE = 'http://localhost:3000';
+        window.REYVAL_API_BASE = window.REYVAL_API_BASE
+            || (window.location.protocol === 'file:' ? 'http://localhost:3000' : '');
     </script>
     <style>
         :root {

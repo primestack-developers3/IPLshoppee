@@ -8,6 +8,10 @@
     <script src="cart-manager.js"></script>
     <script src="data/reyval-catalog.js"></script>
     <script src="scripts/reyval-order-tools.js"></script>
+    <script>
+        window.REYVAL_API_BASE = window.REYVAL_API_BASE
+            || (window.location.protocol === 'file:' ? 'http://localhost:3000' : '');
+    </script>
     <style>
         :root {
             color-scheme: dark;
@@ -166,6 +170,11 @@
             background: rgba(255,255,255,0.04);
         }
 
+        .is-disabled {
+            opacity: 0.55;
+            pointer-events: none;
+        }
+
         @media (min-width: 768px) {
             .details-grid {
                 grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -247,6 +256,15 @@
     <div id="footer-container"></div>
 
     <script>
+        const API_BASE = (window.REYVAL_API_BASE || '').replace(/\/$/, '');
+
+        function resolveApiUrl(path) {
+            if (API_BASE) {
+                return `${API_BASE}${path}`;
+            }
+            return path;
+        }
+
         function renderSuccessOrder(order) {
             if (!order) return;
 
@@ -289,7 +307,7 @@
         }
 
         async function loadOrderFromApi(orderId) {
-            const response = await fetch(`/api/orders?orderId=${encodeURIComponent(orderId)}`);
+            const response = await fetch(resolveApiUrl(`/api/orders?orderId=${encodeURIComponent(orderId)}`));
             if (!response.ok) {
                 throw new Error('API unavailable');
             }
@@ -318,16 +336,15 @@
 
             // Setup download bill button
             const downloadBtn = document.getElementById('downloadBillBtn');
-            if (downloadBtn && order) {
-                downloadBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const link = document.createElement('a');
-                    link.href = `/api/orders/${order.orderId}/bill`;
-                    link.download = `Invoice_${order.orderId}.pdf`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                });
+            if (downloadBtn) {
+                downloadBtn.classList.add('is-disabled');
+                downloadBtn.removeAttribute('href');
+            }
+
+            if (downloadBtn && order?.orderId) {
+                downloadBtn.href = resolveApiUrl(`/api/orders/${encodeURIComponent(order.orderId)}/bill`);
+                downloadBtn.download = `Invoice_${order.orderId}.pdf`;
+                downloadBtn.classList.remove('is-disabled');
             }
 
             sessionStorage.removeItem('checkoutTotal');
